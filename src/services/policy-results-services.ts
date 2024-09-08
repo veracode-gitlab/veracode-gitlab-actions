@@ -4,28 +4,41 @@ import { getApplicationFindings } from './findings-service';
 import { getApplicationByName } from './application-service';
 import * as VeracodeApplication from '../namespaces/VeracodeApplication';
 
-
 export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promise<void> {
-  const veracodeApp: VeracodeApplication.Application = await getApplicationByName(inputs.profile_name, inputs.api_id, inputs.api_key);
-  const findings: VeracodePolicyResult.Finding[] = await getApplicationFindings(veracodeApp.guid, inputs.api_id, inputs.api_key);
+  const veracodeApp: VeracodeApplication.Application = await getApplicationByName(
+    inputs.profile_name,
+    inputs.api_id,
+    inputs.api_key,
+  );
+  const findings: VeracodePolicyResult.Finding[] = await getApplicationFindings(
+    veracodeApp.guid,
+    inputs.api_id,
+    inputs.api_key,
+  );
 
-  if (findings.length > 0 )
-  {
+  if (findings.length > 0) {
     //always generate security tab json file
-    console.log('Json file will be created')
+    console.log('Json file will be created');
 
     const jsonFindings: string[] = []; // Array of stringified findings
     const startTime = new Date().toISOString().substring(0, 19); // Extract date and time without milliseconds
 
     for (const finding of findings) {
       if (finding.violates_policy) {
-        const id = finding.issue_id+'-'+finding.context_guid+'-'+finding.build_id;
+        const id = finding.issue_id + '-' + finding.context_guid + '-' + finding.build_id;
         const severity = getSeverity(finding.finding_details.severity); // Use function for severity mapping
         const description = processDescription(finding.description); // Use function for description processing
         const cwe = finding.finding_details.cwe.id;
         const cweName = finding.finding_details.cwe.name;
         const lineNumber = finding.finding_details.file_line_number;
         // const method = finding.finding_details.procedure;
+        let filePath = finding.finding_details.file_path;
+        if (inputs.src_root && inputs.jsp_root) {
+          if (filePath.startsWith('/WEB-INF'))
+            filePath = inputs.jsp_root + filePath;
+          else
+            filePath = inputs.src_root + filePath;
+        }
 
         const jsonFinding = {
           id: `${finding.issue_id}-${finding.context_guid}-${finding.build_id}`,
@@ -37,19 +50,19 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
           description,
           scanner: {
             id: 'security_code_scan',
-            name: 'Veracode Static Code Analysis'
+            name: 'Veracode Static Code Analysis',
           },
           location: {
-            file: finding.finding_details.file_path,
+            file: filePath,
             start_line: lineNumber,
-            end_line: lineNumber
+            end_line: lineNumber,
           },
           identifiers: {
             type: 'CWE',
             name: 'CWE-' + cwe,
             value: cwe,
-            url: `https://cwe.mitre.org/data/definitions/${cwe}.html`
-          }
+            url: `https://cwe.mitre.org/data/definitions/${cwe}.html`,
+          },
         };
 
         jsonFindings.push(JSON.stringify(jsonFinding));

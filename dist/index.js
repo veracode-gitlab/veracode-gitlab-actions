@@ -227,7 +227,7 @@ exports["default"] = appConfig;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseInputs = void 0;
 const parseInputs = (getInput) => {
-    var _a, _b;
+    var _a, _b, _c, _d;
     const inputMap = {};
     getInput.forEach((input) => {
         const [key, value] = input.split('=');
@@ -250,10 +250,24 @@ const parseInputs = (getInput) => {
     const scan_guid = '';
     const api_id = (_a = inputMap.app_id) !== null && _a !== void 0 ? _a : process.env.VERACODE_API_ID;
     const api_key = (_b = inputMap.app_key) !== null && _b !== void 0 ? _b : process.env.VERACODE_API_KEY;
+    const src_root = (_c = inputMap.src_root) !== null && _c !== void 0 ? _c : process.env.SRC_ROOT;
+    const jsp_root = (_d = inputMap.jsp_root) !== null && _d !== void 0 ? _d : process.env.JSP_ROOT;
     if (!api_id || !api_key) {
         throw new Error('Invalid input. Missing VERACODE_API_ID or VERACODE_API_KEY.');
     }
-    return { action, scan_type, profile_name, scan_guid, gitlab_token, create_issue, gitlab_project, api_id, api_key };
+    return {
+        action,
+        scan_type,
+        profile_name,
+        scan_guid,
+        gitlab_token,
+        create_issue,
+        gitlab_project,
+        api_id,
+        api_key,
+        src_root,
+        jsp_root,
+    };
 };
 exports.parseInputs = parseInputs;
 
@@ -440,6 +454,13 @@ async function preparePolicyResults(inputs) {
                 const cwe = finding.finding_details.cwe.id;
                 const cweName = finding.finding_details.cwe.name;
                 const lineNumber = finding.finding_details.file_line_number;
+                let filePath = finding.finding_details.file_path;
+                if (inputs.src_root && inputs.jsp_root) {
+                    if (filePath.startsWith('/WEB-INF'))
+                        filePath = inputs.jsp_root + filePath;
+                    else
+                        filePath = inputs.src_root + filePath;
+                }
                 const jsonFinding = {
                     id: `${finding.issue_id}-${finding.context_guid}-${finding.build_id}`,
                     category: 'sast',
@@ -450,19 +471,19 @@ async function preparePolicyResults(inputs) {
                     description,
                     scanner: {
                         id: 'security_code_scan',
-                        name: 'Veracode Static Code Analysis'
+                        name: 'Veracode Static Code Analysis',
                     },
                     location: {
-                        file: finding.finding_details.file_path,
+                        file: filePath,
                         start_line: lineNumber,
-                        end_line: lineNumber
+                        end_line: lineNumber,
                     },
                     identifiers: {
                         type: 'CWE',
                         name: 'CWE-' + cwe,
                         value: cwe,
-                        url: `https://cwe.mitre.org/data/definitions/${cwe}.html`
-                    }
+                        url: `https://cwe.mitre.org/data/definitions/${cwe}.html`,
+                    },
                 };
                 jsonFindings.push(JSON.stringify(jsonFinding));
             }

@@ -8,5 +8,7 @@ export interface VeracodeActionsInputs {
     gitlab_project: string;
     api_id: string;
     api_key: string;
+    src_root: string;
+    jsp_root: string;
 }
 export declare const parseInputs: (getInput: string[]) => VeracodeActionsInputs;
