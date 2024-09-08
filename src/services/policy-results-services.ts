@@ -31,7 +31,6 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   const findingsList: VeracodePolicyResult.Finding[] = [];
 
   for (const finding of findings) {
-    console.log(finding);
     if (finding.violates_policy) {
       const id = finding.issue_id + '-' + finding.context_guid + '-' + finding.build_id;
       const severity = getSeverity(finding.finding_details.severity); // Use function for severity mapping
@@ -130,9 +129,6 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
 
   const existingGLIssues = await getGitLabIssues(inputs.gitlab_token);
   console.log(existingGLIssues);
-  console.log(findingsList);
-  console.log(typeof findingsList);
-
   console.log('===================');
   
   console.log('Creating GitLab issue');

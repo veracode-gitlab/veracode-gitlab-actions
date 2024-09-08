@@ -546,7 +546,6 @@ async function preparePolicyResults(inputs) {
     const jsonFindings = [];
     const findingsList = [];
     for (const finding of findings) {
-        console.log(finding);
         if (finding.violates_policy) {
             const id = finding.issue_id + '-' + finding.context_guid + '-' + finding.build_id;
             const severity = getSeverity(finding.finding_details.severity);
@@ -640,8 +639,6 @@ async function preparePolicyResults(inputs) {
         return;
     const existingGLIssues = await (0, gitlab_service_1.getGitLabIssues)(inputs.gitlab_token);
     console.log(existingGLIssues);
-    console.log(findingsList);
-    console.log(typeof findingsList);
     console.log('===================');
     console.log('Creating GitLab issue');
     const gitlabToken = inputs.gitlab_token;
