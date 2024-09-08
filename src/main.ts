@@ -12,10 +12,7 @@ import { parseInputs } from './inputs';
 export async function run(): Promise<void> {
   // Get the input parameters
   const myArgs = process.argv.slice(2);
-  const api_id = process.env.VERACODE_API_ID;
-  const api_key = process.env.VERACODE_API_KEY;
-  console.log(api_id);
-  console.log(api_key);
+
   const inputs = parseInputs(myArgs);
 
   switch (inputs.action) {

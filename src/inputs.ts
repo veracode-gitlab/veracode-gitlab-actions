@@ -10,6 +10,8 @@ command args
 7 - required    - gitlab_token      = GITLAB PRIVATE TOKEN
 8 - required    - create_issue      = true|false
 9 - required    - gitlab_project    = GITLAB PROJECT IP 
+10 - optional   - api_id            = VERACODE API ID
+11 - optional   - api_key           = VERACODE API KEY
 */
 
 export interface VeracodeActionsInputs {
@@ -20,6 +22,8 @@ export interface VeracodeActionsInputs {
   gitlab_token: string;
   create_issue: boolean;
   gitlab_project: string;
+  api_id: string;
+  api_key: string;
 }
 
 export const parseInputs = (getInput: string[]): VeracodeActionsInputs => {
@@ -50,8 +54,14 @@ export const parseInputs = (getInput: string[]): VeracodeActionsInputs => {
   const gitlab_project = inputMap.gitlab_project;
   const create_issue = inputMap.create_issue === 'true';
   const scan_guid = '';
+  const api_id = inputMap.app_id ?? process.env.VERACODE_API_ID;
+  const api_key = inputMap.app_key ?? process.env.VERACODE_API_KEY;
 
-  return { action, scan_type, profile_name, scan_guid, gitlab_token, create_issue, gitlab_project };
+  if (!api_id || !api_key) {
+    throw new Error('Invalid input. Missing VERACODE_API_ID or VERACODE_API_KEY.');
+  } 
+
+  return { action, scan_type, profile_name, scan_guid, gitlab_token, create_issue, gitlab_project, api_id, api_key };
 };
 
 // import { InputOptions } from '@actions/core';

@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseInputs = void 0;
 const parseInputs = (getInput) => {
+    var _a, _b;
     const inputMap = {};
     getInput.forEach((input) => {
         const [key, value] = input.split('=');
@@ -29,7 +30,12 @@ const parseInputs = (getInput) => {
     const gitlab_project = inputMap.gitlab_project;
     const create_issue = inputMap.create_issue === 'true';
     const scan_guid = '';
-    return { action, scan_type, profile_name, scan_guid, gitlab_token, create_issue, gitlab_project };
+    const api_id = (_a = inputMap.app_id) !== null && _a !== void 0 ? _a : process.env.VERACODE_API_ID;
+    const api_key = (_b = inputMap.app_key) !== null && _b !== void 0 ? _b : process.env.VERACODE_API_KEY;
+    if (!api_id || !api_key) {
+        throw new Error('Invalid input. Missing VERACODE_API_ID or VERACODE_API_KEY.');
+    }
+    return { action, scan_type, profile_name, scan_guid, gitlab_token, create_issue, gitlab_project, api_id, api_key };
 };
 exports.parseInputs = parseInputs;
 
@@ -69,10 +75,6 @@ const policyResultsService = __importStar(__nccwpck_require__(505));
 const inputs_1 = __nccwpck_require__(128);
 async function run() {
     const myArgs = process.argv.slice(2);
-    const api_id = process.env.VERACODE_API_ID;
-    const api_key = process.env.VERACODE_API_KEY;
-    console.log(api_id);
-    console.log(api_key);
     const inputs = (0, inputs_1.parseInputs)(myArgs);
     switch (inputs.action) {
         case 'processPolicyResults':

@@ -6,5 +6,7 @@ export interface VeracodeActionsInputs {
     gitlab_token: string;
     create_issue: boolean;
     gitlab_project: string;
+    api_id: string;
+    api_key: string;
 }
 export declare const parseInputs: (getInput: string[]) => VeracodeActionsInputs;
