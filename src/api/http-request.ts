@@ -3,13 +3,29 @@ import appConfig from '../app-config';
 
 interface Resource {
   resourceUri: string;
-  queryAttribute: string;
-  queryValue: string;
+  queryAttribute?: string;
+  queryValue?: string;
+  body?: Record<string, unknown>;
 }
 
 interface ResourceById {
   resourceUri: string;
   resourceId: string;
+}
+
+export async function createGitLabResource(resource: Resource, gitlabToken: string): Promise<void> {
+  const resourceUri = resource.resourceUri;
+  const body = resource.body;
+  const headers = {
+    'Content-Type': 'application/json',
+    'PRIVATE-TOKEN': gitlabToken,
+  }
+  const appUrl = `${resourceUri}`;
+  try {
+    await fetch(appUrl, { method: 'POST', headers, body: JSON.stringify(body) });
+  } catch (error) {
+    throw new Error('Failed to create resource.');
+  }
 }
 
 export async function getGitLabResourceByAttribute<T>(resource: Resource, gitlabToken: string): Promise<T> {

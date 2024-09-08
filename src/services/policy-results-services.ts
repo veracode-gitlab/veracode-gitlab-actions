@@ -2,7 +2,7 @@ import { VeracodeActionsInputs } from '../inputs';
 import * as VeracodePolicyResult from '../namespaces/VeracodePolicyResult';
 import { getApplicationFindings } from './findings-service';
 import { getApplicationByName } from './application-service';
-import { getGitLabIssues } from './gitlab-service';
+import { getGitLabIssues, createGitLabIssue } from './gitlab-service';
 import * as VeracodeApplication from '../namespaces/VeracodeApplication';
 import { promises as fs } from 'fs'; // Using promises for asynchronous file operations
 import * as path from 'path'; // Import the path module
@@ -84,14 +84,10 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
       const issueLabel = `Static Code Ananlysis,CWE:${cwe},${severity}`;
       const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${description} \n* ${cweName}:${cwe} \n* File Path: [${filePath}:${lineNumber}](${projectURL}/-/blob/${commitSHA}/${filePath}#L${lineNumber}) \n* Scanner: Veracode Sast Scan`;
 
-      console.log(issueTitle);
-      console.log(issueLabel);
-      console.log(issueDescription);
-
       const gitlabIssue = {
-        id: 0,
-        iid: 0,
-        project_id: 0,
+        // id: 0,
+        // iid: 0,
+        // project_id: 0,
         title: issueTitle,
         description: issueDescription,
         state: 'opened',
@@ -160,10 +156,17 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
     }
   }
 
-  console.log(gitlabIssuesToAdd);
-
   // Create a GitLab issue
-  // Use the GitLab API to create an issue
+  // Use the GitLab API to create issues concurrently
+  await Promise.all(
+    gitlabIssuesToAdd.map(async (issue) => {
+      try {
+        await createGitLabIssue(inputs.gitlab_token, issue);
+      } catch (error) {
+        console.error(`Error creating GitLab issue: ${error}`);
+      }
+    }),
+  );
 }
 
 // Function to map severity values (optional)

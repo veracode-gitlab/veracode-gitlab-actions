@@ -77,9 +77,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.deleteResourceById = exports.getResourceByAttribute = exports.getGitLabResourceByAttribute = void 0;
+exports.deleteResourceById = exports.getResourceByAttribute = exports.getGitLabResourceByAttribute = exports.createGitLabResource = void 0;
 const veracode_hmac_1 = __nccwpck_require__(841);
 const app_config_1 = __importDefault(__nccwpck_require__(684));
+async function createGitLabResource(resource, gitlabToken) {
+    const resourceUri = resource.resourceUri;
+    const body = resource.body;
+    const headers = {
+        'Content-Type': 'application/json',
+        'PRIVATE-TOKEN': gitlabToken,
+    };
+    const appUrl = `${resourceUri}`;
+    try {
+        await fetch(appUrl, { method: 'POST', headers, body: JSON.stringify(body) });
+    }
+    catch (error) {
+        throw new Error('Failed to create resource.');
+    }
+}
+exports.createGitLabResource = createGitLabResource;
 async function getGitLabResourceByAttribute(resource, gitlabToken) {
     const resourceUri = resource.resourceUri;
     const queryAttribute = resource.queryAttribute;
@@ -478,7 +494,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getGitLabIssues = void 0;
+exports.createGitLabIssue = exports.getGitLabIssues = void 0;
 const http = __importStar(__nccwpck_require__(740));
 async function getGitLabIssues(gitlabToken) {
     const gitlabApiUrl = process.env.CI_API_V4_URL;
@@ -498,6 +514,26 @@ async function getGitLabIssues(gitlabToken) {
     }
 }
 exports.getGitLabIssues = getGitLabIssues;
+async function createGitLabIssue(gitlabToken, issue) {
+    const gitlabApiUrl = process.env.CI_API_V4_URL;
+    const gitlabProjectId = process.env.CI_PROJECT_ID;
+    try {
+        const createIssueResource = {
+            resourceUri: `${gitlabApiUrl}/projects/${gitlabProjectId}/issues`,
+            body: {
+                title: issue.title,
+                description: issue.description,
+                labels: issue.labels,
+            },
+        };
+        await http.createGitLabResource(createIssueResource, gitlabToken);
+    }
+    catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+exports.createGitLabIssue = createGitLabIssue;
 
 
 /***/ }),
@@ -596,13 +632,7 @@ async function preparePolicyResults(inputs) {
             const issueTitle = `Static Code Analysis - ${fileName}:${lineNumber} - Severity: ${severity} - CWE-${cwe}: ${cweName}`;
             const issueLabel = `Static Code Ananlysis,CWE:${cwe},${severity}`;
             const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${description} \n* ${cweName}:${cwe} \n* File Path: [${filePath}:${lineNumber}](${projectURL}/-/blob/${commitSHA}/${filePath}#L${lineNumber}) \n* Scanner: Veracode Sast Scan`;
-            console.log(issueTitle);
-            console.log(issueLabel);
-            console.log(issueDescription);
             const gitlabIssue = {
-                id: 0,
-                iid: 0,
-                project_id: 0,
                 title: issueTitle,
                 description: issueDescription,
                 state: 'opened',
@@ -664,7 +694,14 @@ async function preparePolicyResults(inputs) {
             gitlabIssuesToAdd.push(glIssue);
         }
     }
-    console.log(gitlabIssuesToAdd);
+    await Promise.all(gitlabIssuesToAdd.map(async (issue) => {
+        try {
+            await (0, gitlab_service_1.createGitLabIssue)(inputs.gitlab_token, issue);
+        }
+        catch (error) {
+            console.error(`Error creating GitLab issue: ${error}`);
+        }
+    }));
 }
 exports.preparePolicyResults = preparePolicyResults;
 function getSeverity(weight) {
