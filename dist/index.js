@@ -69,6 +69,10 @@ const policyResultsService = __importStar(__nccwpck_require__(505));
 const inputs_1 = __nccwpck_require__(128);
 async function run() {
     const myArgs = process.argv.slice(2);
+    const api_id = process.env.VERACODE_API_ID;
+    const api_key = process.env.VERACODE_API_KEY;
+    console.log(api_id);
+    console.log(api_key);
     const inputs = (0, inputs_1.parseInputs)(myArgs);
     switch (inputs.action) {
         case 'processPolicyResults':

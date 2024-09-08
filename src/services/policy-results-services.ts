@@ -7,6 +7,7 @@ import { VeracodeActionsInputs } from '../inputs';
 // import { updateChecks } from './check-service';
 
 export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promise<void> {
+  
   console.log(inputs);
 }
 
