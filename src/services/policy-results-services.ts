@@ -19,14 +19,37 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
 
     for (const finding of findings) {
       if (finding.violates_policy) {
+        const id = finding.issue_id+'-'+finding.context_guid+'-'+finding.build_id;
         const severity = getSeverity(finding.finding_details.severity); // Use function for severity mapping
         const description = processDescription(finding.description); // Use function for description processing
+        const cwe = finding.finding_details.cwe.id;
+        const cweName = finding.finding_details.cwe.name;
+        const lineNumber = finding.finding_details.file_line_number;
+        // const method = finding.finding_details.procedure;
 
         const jsonFinding = {
           id: `${finding.issue_id}-${finding.context_guid}-${finding.build_id}`,
           category: 'sast',
+          name: cweName,
+          message: cweName,
+          cve: id,
           severity,
           description,
+          scanner: {
+            id: 'security_code_scan',
+            name: 'Veracode Static Code Analysis'
+          },
+          location: {
+            file: finding.finding_details.file_path,
+            start_line: lineNumber,
+            end_line: lineNumber
+          },
+          identifiers: {
+            type: 'CWE',
+            name: 'CWE-' + cwe,
+            value: cwe,
+            url: `https://cwe.mitre.org/data/definitions/${cwe}.html`
+          }
         };
 
         jsonFindings.push(JSON.stringify(jsonFinding));

@@ -16,6 +16,7 @@ export interface Finding {
     };
     file_path: string;
     file_line_number: number;
+    procedure: string;
   };
   context_guid: string;
   build_id: number;
