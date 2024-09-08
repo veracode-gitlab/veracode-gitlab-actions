@@ -12,9 +12,7 @@ import { parseInputs } from './inputs';
 export async function run(): Promise<void> {
   // Get the input parameters
   const myArgs = process.argv.slice(2);
-  console.log(myArgs);
   const inputs = parseInputs(myArgs);
-  console.log(inputs);
 
   switch (inputs.action) {
     case 'processPolicyResults':
@@ -22,7 +20,6 @@ export async function run(): Promise<void> {
       break;
     default:
       throw new Error('Invalid action');
-      
   }
 
   // switch (inputs.action) {

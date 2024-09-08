@@ -27,10 +27,20 @@ export const parseInputs = (getInput: string[]): VeracodeActionsInputs => {
   const inputMap: Record<string, string> = {};
   getInput.forEach((input) => {
     const [key, value] = input.split('=');
-    inputMap[key] = value;
+    inputMap[key.trim()] = value.trim(); // Trim both key and value
   });
 
-  console.log(inputMap);
+  // Validate input array length and format
+  if (
+    !inputMap.action ||
+    !inputMap.scan_type ||
+    !inputMap.profile_name ||
+    !inputMap.gitlab_token ||
+    !inputMap.create_issue ||
+    !inputMap.gitlab_project
+  ) {
+    throw new Error('Invalid input. Please provide all required inputs.');
+  }
 
   // Extract values and perform type conversions
   const action = inputMap.action;
@@ -40,9 +50,6 @@ export const parseInputs = (getInput: string[]): VeracodeActionsInputs => {
   const gitlab_project = inputMap.gitlab_project;
   const create_issue = inputMap.create_issue === 'true';
   const scan_guid = '';
-
-  // Validate input array length and format
-  
 
   return { action, scan_type, profile_name, scan_guid, gitlab_token, create_issue, gitlab_project };
 };

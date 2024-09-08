@@ -12,9 +12,16 @@ const parseInputs = (getInput) => {
     const inputMap = {};
     getInput.forEach((input) => {
         const [key, value] = input.split('=');
-        inputMap[key] = value;
+        inputMap[key.trim()] = value.trim();
     });
-    console.log(inputMap);
+    if (!inputMap.action ||
+        !inputMap.scan_type ||
+        !inputMap.profile_name ||
+        !inputMap.gitlab_token ||
+        !inputMap.create_issue ||
+        !inputMap.gitlab_project) {
+        throw new Error('Invalid input. Please provide all required inputs.');
+    }
     const action = inputMap.action;
     const scan_type = inputMap.scan_type;
     const profile_name = inputMap.profile_name;
@@ -62,9 +69,7 @@ const policyResultsService = __importStar(__nccwpck_require__(505));
 const inputs_1 = __nccwpck_require__(128);
 async function run() {
     const myArgs = process.argv.slice(2);
-    console.log(myArgs);
     const inputs = (0, inputs_1.parseInputs)(myArgs);
-    console.log(inputs);
     switch (inputs.action) {
         case 'processPolicyResults':
             await policyResultsService.preparePolicyResults(inputs);
