@@ -544,7 +544,9 @@ async function preparePolicyResults(inputs) {
         return;
     console.log('Json file will be created');
     const jsonFindings = [];
-    const findingsList = [];
+    const gitlabIssuesToAdd = [];
+    const projectURL = process.env.CI_PROJECT_URL;
+    const commitSHA = process.env.CI_COMMIT_SHA;
     for (const finding of findings) {
         if (finding.violates_policy) {
             const id = finding.issue_id + '-' + finding.context_guid + '-' + finding.build_id;
@@ -590,8 +592,22 @@ async function preparePolicyResults(inputs) {
                     },
                 ],
             };
-            findingsList.push(finding);
             jsonFindings.push(JSON.stringify(jsonFinding));
+            const issueTitle = `Static Code Analysis - ${fileName}:${lineNumber} - Severity: ${severity} - CWE-${cwe}: ${cweName}`;
+            const issueLabel = `Static Code Ananlysis,CWE:${cwe},${severity}`;
+            const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${description} \n* ${cweName}:${cwe} \n* File Path: [${filePath}:${lineNumber}](${projectURL}/-/blob/${commitSHA}/${filePath}#L${lineNumber}) \n* Scanner: Veracode Sast Scan`;
+            console.log(issueTitle);
+            console.log(issueLabel);
+            console.log(issueDescription);
+            const gitlabIssue = {
+                title: issueTitle,
+                description: issueDescription,
+                state: 'opened',
+                labels: issueLabel.split(','),
+                severity,
+                imported_from: 'Veracode SAST',
+            };
+            gitlabIssuesToAdd.push(gitlabIssue);
         }
     }
     const startTime = new Date().toISOString().substring(0, 19);
@@ -639,31 +655,7 @@ async function preparePolicyResults(inputs) {
         return;
     const existingGLIssues = await (0, gitlab_service_1.getGitLabIssues)(inputs.gitlab_token);
     console.log('Existing GitLab issues:', existingGLIssues);
-    const projectURL = process.env.CI_PROJECT_URL;
-    const commitSHA = process.env.CI_COMMIT_SHA;
-    for (const finding of findings) {
-        if (finding.violates_policy) {
-            const severity = getSeverity(finding.finding_details.severity);
-            const description = processDescription(finding.description);
-            const cwe = finding.finding_details.cwe.id;
-            const cweName = finding.finding_details.cwe.name;
-            const lineNumber = finding.finding_details.file_line_number;
-            const fileName = finding.finding_details.file_name;
-            let filePath = finding.finding_details.file_path;
-            if (inputs.src_root && inputs.jsp_root) {
-                if (filePath.startsWith('/WEB-INF'))
-                    filePath = inputs.jsp_root + filePath;
-                else
-                    filePath = inputs.src_root + filePath;
-            }
-            const issueTitle = `Static Code Analysis - ${fileName}:${lineNumber} - Severity: ${severity} - CWE-${cwe}: ${cweName}`;
-            const issueLabel = `Static Code Ananlysis,CWE:${cwe},${severity}`;
-            const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${description} \n* ${cweName}:${cwe} \n* File Path: [${filePath}:${lineNumber}](${projectURL}/-/blob/${commitSHA}/${filePath}#L${lineNumber}) \n* Scanner: Veracode Sast Scan`;
-            console.log(issueTitle);
-            console.log(issueLabel);
-            console.log(issueDescription);
-        }
-    }
+    console.log(gitlabIssuesToAdd);
 }
 exports.preparePolicyResults = preparePolicyResults;
 function getSeverity(weight) {

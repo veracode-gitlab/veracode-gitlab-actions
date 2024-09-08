@@ -1,7 +1,7 @@
 export interface GLIssue {
-  id: number;
-  iid: number;
-  project_id: number;
+  id?: number;
+  iid?: number;
+  project_id?: number;
   title: string;
   description: string;
   state: string;

@@ -6,6 +6,7 @@ import { getGitLabIssues } from './gitlab-service';
 import * as VeracodeApplication from '../namespaces/VeracodeApplication';
 import { promises as fs } from 'fs'; // Using promises for asynchronous file operations
 import * as path from 'path'; // Import the path module
+import { GLIssue } from '../namespaces/GitLabIssue';
 
 const gitlabOutputFileName = 'output-sast-vulnerabilites.json';
 
@@ -27,7 +28,10 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   console.log('Json file will be created');
 
   const jsonFindings: string[] = []; // Array of stringified findings
-  const findingsList: VeracodePolicyResult.Finding[] = [];
+  const gitlabIssuesToAdd: GLIssue[] = []; // Array of GitLab issues to add
+
+  const projectURL = process.env.CI_PROJECT_URL;
+  const commitSHA = process.env.CI_COMMIT_SHA;
 
   for (const finding of findings) {
     if (finding.violates_policy) {
@@ -74,8 +78,28 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
         ],
       };
 
-      findingsList.push(finding);
       jsonFindings.push(JSON.stringify(jsonFinding));
+
+      const issueTitle = `Static Code Analysis - ${fileName}:${lineNumber} - Severity: ${severity} - CWE-${cwe}: ${cweName}`;
+      const issueLabel = `Static Code Ananlysis,CWE:${cwe},${severity}`;
+      const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${description} \n* ${cweName}:${cwe} \n* File Path: [${filePath}:${lineNumber}](${projectURL}/-/blob/${commitSHA}/${filePath}#L${lineNumber}) \n* Scanner: Veracode Sast Scan`;
+
+      console.log(issueTitle);
+      console.log(issueLabel);
+      console.log(issueDescription);
+
+      const gitlabIssue: GLIssue = {
+        // id: 0,
+        // iid: 0,
+        // project_id: 0,
+        title: issueTitle,
+        description: issueDescription,
+        state: 'opened',
+        labels: issueLabel.split(','),
+        severity,
+        imported_from: 'Veracode SAST',
+      };
+      gitlabIssuesToAdd.push(gitlabIssue);
     }
   }
 
@@ -128,31 +152,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   const existingGLIssues = await getGitLabIssues(inputs.gitlab_token);
   console.log('Existing GitLab issues:', existingGLIssues);
 
-  const projectURL = process.env.CI_PROJECT_URL;
-  const commitSHA = process.env.CI_COMMIT_SHA;
-
-  for (const finding of findings) {
-    if (finding.violates_policy) {
-      const severity = getSeverity(finding.finding_details.severity); // Use function for severity mapping
-      const description = processDescription(finding.description); // Use function for description processing
-      const cwe = finding.finding_details.cwe.id;
-      const cweName = finding.finding_details.cwe.name;
-      const lineNumber = finding.finding_details.file_line_number;
-      const fileName = finding.finding_details.file_name;
-      let filePath = finding.finding_details.file_path;
-      if (inputs.src_root && inputs.jsp_root) {
-        if (filePath.startsWith('/WEB-INF')) filePath = inputs.jsp_root + filePath;
-        else filePath = inputs.src_root + filePath;
-      }
-
-      const issueTitle = `Static Code Analysis - ${fileName}:${lineNumber} - Severity: ${severity} - CWE-${cwe}: ${cweName}`;
-      const issueLabel = `Static Code Ananlysis,CWE:${cwe},${severity}`;
-      const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${description} \n* ${cweName}:${cwe} \n* File Path: [${filePath}:${lineNumber}](${projectURL}/-/blob/${commitSHA}/${filePath}#L${lineNumber}) \n* Scanner: Veracode Sast Scan`;
-      console.log(issueTitle);
-      console.log(issueLabel);
-      console.log(issueDescription);
-    }
-  }
+  console.log(gitlabIssuesToAdd);
 
   // Create a GitLab issue
   // Use the GitLab API to create an issue
