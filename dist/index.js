@@ -508,7 +508,7 @@ async function preparePolicyResults(inputs) {
                         {
                             type: 'CWE',
                             name: 'CWE-' + cwe,
-                            value: cwe,
+                            value: cwe + '',
                             url: `https://cwe.mitre.org/data/definitions/${cwe}.html`,
                         },
                     ],

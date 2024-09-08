@@ -63,7 +63,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
             {
               type: 'CWE',
               name: 'CWE-' + cwe,
-              value: cwe,
+              value: cwe + '',
               url: `https://cwe.mitre.org/data/definitions/${cwe}.html`,
             },
           ],
