@@ -5,7 +5,6 @@ export interface VeracodeActionsInputs {
     scan_guid: string;
     gitlab_token: string;
     create_issue: boolean;
-    gitlab_project: string;
     api_id: string;
     api_key: string;
     src_root: string;

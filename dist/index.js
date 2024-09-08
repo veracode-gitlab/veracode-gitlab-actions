@@ -237,15 +237,13 @@ const parseInputs = (getInput) => {
         !inputMap.scan_type ||
         !inputMap.profile_name ||
         !inputMap.gitlab_token ||
-        !inputMap.create_issue ||
-        !inputMap.gitlab_project) {
+        !inputMap.create_issue) {
         throw new Error('Invalid input. Please provide all required inputs.');
     }
     const action = inputMap.action;
     const scan_type = inputMap.scan_type;
     const profile_name = inputMap.profile_name;
     const gitlab_token = inputMap.gitlab_token;
-    const gitlab_project = inputMap.gitlab_project;
     const create_issue = inputMap.create_issue === 'true';
     const scan_guid = '';
     const api_id = (_a = inputMap.app_id) !== null && _a !== void 0 ? _a : process.env.VERACODE_API_ID;
@@ -255,6 +253,9 @@ const parseInputs = (getInput) => {
     if (!api_id || !api_key) {
         throw new Error('Invalid input. Missing VERACODE_API_ID or VERACODE_API_KEY.');
     }
+    if (create_issue && !gitlab_token) {
+        throw new Error('Invalid input. Missing GITLAB_PRIVATE_TOKEN.');
+    }
     return {
         action,
         scan_type,
@@ -262,7 +263,6 @@ const parseInputs = (getInput) => {
         scan_guid,
         gitlab_token,
         create_issue,
-        gitlab_project,
         api_id,
         api_key,
         src_root,
@@ -468,94 +468,109 @@ const gitlabOutputFileName = 'output-sast-vulnerabilites.json';
 async function preparePolicyResults(inputs) {
     const veracodeApp = await (0, application_service_1.getApplicationByName)(inputs.profile_name, inputs.api_id, inputs.api_key);
     const findings = await (0, findings_service_1.getApplicationFindings)(veracodeApp.guid, inputs.api_id, inputs.api_key);
-    if (findings.length > 0) {
-        console.log('Json file will be created');
-        const jsonFindings = [];
-        const startTime = new Date().toISOString().substring(0, 19);
-        for (const finding of findings) {
-            if (finding.violates_policy) {
-                const id = finding.issue_id + '-' + finding.context_guid + '-' + finding.build_id;
-                const severity = getSeverity(finding.finding_details.severity);
-                const description = processDescription(finding.description);
-                const cwe = finding.finding_details.cwe.id;
-                const cweName = finding.finding_details.cwe.name;
-                const lineNumber = finding.finding_details.file_line_number;
-                let filePath = finding.finding_details.file_path;
-                if (inputs.src_root && inputs.jsp_root) {
-                    if (filePath.startsWith('/WEB-INF'))
-                        filePath = inputs.jsp_root + filePath;
-                    else
-                        filePath = inputs.src_root + filePath;
-                }
-                const jsonFinding = {
-                    id: `${finding.issue_id}-${finding.context_guid}-${finding.build_id}`,
-                    category: 'sast',
-                    name: cweName,
-                    message: cweName,
-                    cve: id,
-                    severity,
-                    description,
-                    scanner: {
-                        id: 'security_code_scan',
-                        name: 'Veracode Static Code Analysis',
+    if (findings.length === 0)
+        return;
+    console.log('Json file will be created');
+    const jsonFindings = [];
+    const startTime = new Date().toISOString().substring(0, 19);
+    for (const finding of findings) {
+        if (finding.violates_policy) {
+            const id = finding.issue_id + '-' + finding.context_guid + '-' + finding.build_id;
+            const severity = getSeverity(finding.finding_details.severity);
+            const description = processDescription(finding.description);
+            const cwe = finding.finding_details.cwe.id;
+            const cweName = finding.finding_details.cwe.name;
+            const lineNumber = finding.finding_details.file_line_number;
+            let filePath = finding.finding_details.file_path;
+            if (inputs.src_root && inputs.jsp_root) {
+                if (filePath.startsWith('/WEB-INF'))
+                    filePath = inputs.jsp_root + filePath;
+                else
+                    filePath = inputs.src_root + filePath;
+            }
+            const jsonFinding = {
+                id: `${finding.issue_id}-${finding.context_guid}-${finding.build_id}`,
+                category: 'sast',
+                name: cweName,
+                message: cweName,
+                cve: id,
+                severity,
+                description,
+                scanner: {
+                    id: 'security_code_scan',
+                    name: 'Veracode Static Code Analysis',
+                },
+                location: {
+                    file: filePath,
+                    start_line: lineNumber,
+                    end_line: lineNumber,
+                },
+                identifiers: [
+                    {
+                        type: 'CWE',
+                        name: 'CWE-' + cwe,
+                        value: cwe + '',
+                        url: `https://cwe.mitre.org/data/definitions/${cwe}.html`,
                     },
-                    location: {
-                        file: filePath,
-                        start_line: lineNumber,
-                        end_line: lineNumber,
-                    },
-                    identifiers: [
-                        {
-                            type: 'CWE',
-                            name: 'CWE-' + cwe,
-                            value: cwe + '',
-                            url: `https://cwe.mitre.org/data/definitions/${cwe}.html`,
-                        },
-                    ],
-                };
-                jsonFindings.push(JSON.stringify(jsonFinding));
-            }
+                ],
+            };
+            jsonFindings.push(JSON.stringify(jsonFinding));
         }
-        const jsonEnd = `,"scan": {
-        "analyzer": {
-          "id": "veracodeSAST",
-          "name": "Veracode SAST",
-          "url": "https://www.veracode.com",
-          "vendor": {
-            "name": "Veracode"
-          },
-          "version": "latest"
+    }
+    const jsonEnd = `,"scan": {
+      "analyzer": {
+        "id": "veracodeSAST",
+        "name": "Veracode SAST",
+        "url": "https://www.veracode.com",
+        "vendor": {
+          "name": "Veracode"
         },
-        "scanner": {
-          "id": "veracodeSAST",
-          "name": "Veracode SAST",
-          "url": "https://www.veracode.com",
-          "vendor": {
-            "name": "Veracode"
-          },
-          "version": "latest"
+        "version": "latest"
+      },
+      "scanner": {
+        "id": "veracodeSAST",
+        "name": "Veracode SAST",
+        "url": "https://www.veracode.com",
+        "vendor": {
+          "name": "Veracode"
         },
-        "primary_identifiers": [],
-        "type": "sast",
-        "start_time": "${startTime}",
-        "end_time": "${startTime}",
-        "status": "success"
-      }
-    }`;
-        const fullReportJson = `{"version": "15.0.4","vulnerabilities": [${jsonFindings.join(',')}]${jsonEnd}`;
-        const cwd = process.env.CI_PROJECT_DIR;
-        try {
-            if (cwd) {
-                await fs_1.promises.writeFile(path.join(cwd, gitlabOutputFileName), fullReportJson);
-            }
-            else {
-                console.error('Error: CI_PROJECT_DIR environment variable is undefined.');
-            }
-            console.log(`Json file written to: ${path.join(cwd || '', gitlabOutputFileName)}`);
+        "version": "latest"
+      },
+      "primary_identifiers": [],
+      "type": "sast",
+      "start_time": "${startTime}",
+      "end_time": "${startTime}",
+      "status": "success"
+    }
+  }`;
+    const fullReportJson = `{"version": "15.0.4","vulnerabilities": [${jsonFindings.join(',')}]${jsonEnd}`;
+    const cwd = process.env.CI_PROJECT_DIR;
+    try {
+        if (cwd) {
+            await fs_1.promises.writeFile(path.join(cwd, gitlabOutputFileName), fullReportJson);
         }
-        catch (error) {
-            console.error(`Error writing json file: ${error}`);
+        else {
+            console.error('Error: CI_PROJECT_DIR environment variable is undefined.');
         }
+        console.log(`Json file written to: ${path.join(cwd || '', gitlabOutputFileName)}`);
+    }
+    catch (error) {
+        console.error(`Error writing json file: ${error}`);
+    }
+    if (inputs.create_issue) {
+        console.log('Creating GitLab issue');
+        const gitlabToken = inputs.gitlab_token;
+        console.log(gitlabToken);
+        const projectURL = process.env.CI_PROJECT_URL;
+        console.log(projectURL);
+        const projectName = process.env.CI_PROJECT_NAME;
+        console.log(projectName);
+        const porjectID = process.env.CI_PROJECT_ID;
+        console.log(porjectID);
+        const projectPath = process.env.CI_PROJECT_PATH;
+        console.log(projectPath);
+        const commitSHA = process.env.CI_COMMIT_SHA;
+        console.log(commitSHA);
     }
 }
 exports.preparePolicyResults = preparePolicyResults;

@@ -9,7 +9,6 @@ command args
 6 - optional    - sandbox_guid      = SANDBOX_GUID
 7 - required    - gitlab_token      = GITLAB PRIVATE TOKEN
 8 - required    - create_issue      = true|false
-9 - required    - gitlab_project    = GITLAB PROJECT IP 
 10 - optional   - api_id            = VERACODE API ID
 11 - optional   - api_key           = VERACODE API KEY
 12 - optional   - src_root          = SRC_ROOT
@@ -23,7 +22,6 @@ export interface VeracodeActionsInputs {
   scan_guid: string;
   gitlab_token: string;
   create_issue: boolean;
-  gitlab_project: string;
   api_id: string;
   api_key: string;
   src_root: string;
@@ -44,8 +42,7 @@ export const parseInputs = (getInput: string[]): VeracodeActionsInputs => {
     !inputMap.scan_type ||
     !inputMap.profile_name ||
     !inputMap.gitlab_token ||
-    !inputMap.create_issue ||
-    !inputMap.gitlab_project
+    !inputMap.create_issue
   ) {
     throw new Error('Invalid input. Please provide all required inputs.');
   }
@@ -55,7 +52,6 @@ export const parseInputs = (getInput: string[]): VeracodeActionsInputs => {
   const scan_type = inputMap.scan_type;
   const profile_name = inputMap.profile_name;
   const gitlab_token = inputMap.gitlab_token;
-  const gitlab_project = inputMap.gitlab_project;
   const create_issue = inputMap.create_issue === 'true';
   const scan_guid = '';
   const api_id = inputMap.app_id ?? process.env.VERACODE_API_ID;
@@ -67,6 +63,10 @@ export const parseInputs = (getInput: string[]): VeracodeActionsInputs => {
     throw new Error('Invalid input. Missing VERACODE_API_ID or VERACODE_API_KEY.');
   }
 
+  if (create_issue && !gitlab_token) {
+    throw new Error('Invalid input. Missing GITLAB_PRIVATE_TOKEN.');
+  }
+
   return {
     action,
     scan_type,
@@ -74,7 +74,6 @@ export const parseInputs = (getInput: string[]): VeracodeActionsInputs => {
     scan_guid,
     gitlab_token,
     create_issue,
-    gitlab_project,
     api_id,
     api_key,
     src_root,
