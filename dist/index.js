@@ -546,6 +546,7 @@ async function preparePolicyResults(inputs) {
     const jsonFindings = [];
     const findingsList = [];
     for (const finding of findings) {
+        console.log(finding);
         if (finding.violates_policy) {
             const id = finding.issue_id + '-' + finding.context_guid + '-' + finding.build_id;
             const severity = getSeverity(finding.finding_details.severity);
@@ -561,7 +562,7 @@ async function preparePolicyResults(inputs) {
                     filePath = inputs.src_root + filePath;
             }
             const jsonFinding = {
-                id: `${finding.issue_id}-${finding.context_guid}-${finding.build_id}`,
+                id,
                 category: 'sast',
                 name: cweName,
                 message: cweName,

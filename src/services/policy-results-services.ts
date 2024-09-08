@@ -31,6 +31,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   const findingsList: VeracodePolicyResult.Finding[] = [];
 
   for (const finding of findings) {
+    console.log(finding);
     if (finding.violates_policy) {
       const id = finding.issue_id + '-' + finding.context_guid + '-' + finding.build_id;
       const severity = getSeverity(finding.finding_details.severity); // Use function for severity mapping
@@ -39,6 +40,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
       const cweName = finding.finding_details.cwe.name;
       const lineNumber = finding.finding_details.file_line_number;
       // const method = finding.finding_details.procedure;
+      // const fileName = finding.finding_details.file_name;
       let filePath = finding.finding_details.file_path;
       if (inputs.src_root && inputs.jsp_root) {
         if (filePath.startsWith('/WEB-INF')) filePath = inputs.jsp_root + filePath;
@@ -46,7 +48,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
       }
 
       const jsonFinding = {
-        id: `${finding.issue_id}-${finding.context_guid}-${finding.build_id}`,
+        id,
         category: 'sast',
         name: cweName,
         message: cweName,
