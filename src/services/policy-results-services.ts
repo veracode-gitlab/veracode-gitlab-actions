@@ -9,6 +9,24 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   const veracodeApp: VeracodeApplication.Application = await getApplicationByName(inputs.profile_name, inputs.api_id, inputs.api_key);
   const findings: VeracodePolicyResult.Finding[] = await getApplicationFindings(veracodeApp.guid, inputs.api_id, inputs.api_key);
   console.log(findings);
+
+  if (findings.length > 0 )
+  {
+    //always generate security tab json file
+    console.log('Json file will be created')
+        
+    // const json_findings=[]
+    // const json_start = '{"version": "15.0.4","vulnerabilities": ['
+
+    // json findings
+    let m = 0;
+    while (m < findings.length) {
+      const id = findings[m].issue_id+'-'+findings[m].context_guid+'-'+findings[m].build_id;
+      console.log(id);
+      m++;
+    }
+
+  }
 }
 
 // export async function preparePolicyResults(inputs: Inputs): Promise<void> {
