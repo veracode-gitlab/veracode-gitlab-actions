@@ -62,6 +62,7 @@ const inputs_1 = __nccwpck_require__(128);
 async function run() {
     const myArgs = process.argv.slice(2);
     const inputs = (0, inputs_1.parseInputs)(myArgs);
+    console.log(inputs);
     switch (inputs.action) {
         case 'processPolicyResults':
             await policyResultsService.preparePolicyResults(inputs);

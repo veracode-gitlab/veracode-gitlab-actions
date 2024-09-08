@@ -14,6 +14,8 @@ export async function run(): Promise<void> {
   const myArgs = process.argv.slice(2);
   const inputs = parseInputs(myArgs);
 
+  console.log(inputs);
+
   switch (inputs.action) {
     case 'processPolicyResults':
       await policyResultsService.preparePolicyResults(inputs);
