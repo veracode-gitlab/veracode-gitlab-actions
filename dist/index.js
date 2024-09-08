@@ -544,6 +544,7 @@ async function preparePolicyResults(inputs) {
         return;
     console.log('Json file will be created');
     const jsonFindings = [];
+    const findingsList = [];
     for (const finding of findings) {
         if (finding.violates_policy) {
             const id = finding.issue_id + '-' + finding.context_guid + '-' + finding.build_id;
@@ -585,6 +586,7 @@ async function preparePolicyResults(inputs) {
                     },
                 ],
             };
+            findingsList.push(finding);
             jsonFindings.push(JSON.stringify(jsonFinding));
         }
     }
@@ -633,8 +635,8 @@ async function preparePolicyResults(inputs) {
         return;
     const existingGLIssues = await (0, gitlab_service_1.getGitLabIssues)(inputs.gitlab_token);
     console.log(existingGLIssues);
-    console.log(jsonFindings);
-    console.log(typeof jsonFindings);
+    console.log(findingsList);
+    console.log(typeof findingsList);
     console.log('===================');
     console.log('Creating GitLab issue');
     const gitlabToken = inputs.gitlab_token;

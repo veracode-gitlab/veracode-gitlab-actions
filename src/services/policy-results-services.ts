@@ -28,6 +28,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   console.log('Json file will be created');
 
   const jsonFindings: string[] = []; // Array of stringified findings
+  const findingsList: VeracodePolicyResult.Finding[] = [];
 
   for (const finding of findings) {
     if (finding.violates_policy) {
@@ -71,6 +72,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
         ],
       };
 
+      findingsList.push(finding);
       jsonFindings.push(JSON.stringify(jsonFinding));
     }
   }
@@ -124,8 +126,8 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
 
   const existingGLIssues = await getGitLabIssues(inputs.gitlab_token);
   console.log(existingGLIssues);
-  console.log(jsonFindings);
-  console.log(typeof jsonFindings);
+  console.log(findingsList);
+  console.log(typeof findingsList);
 
   console.log('===================');
   
