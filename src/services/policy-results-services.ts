@@ -4,10 +4,11 @@
 import { VeracodeActionsInputs } from '../inputs';
 // import * as VeracodePolicyResult from '../namespaces/VeracodePolicyResult';
 // import * as Checks from '../namespaces/Checks';
-// import { updateChecks } from './check-service';
+import { getApplicationByName } from './application-service';
 
 export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promise<void> {
-  console.log(inputs);
+  const veracodeApp = await getApplicationByName(inputs.profile_name, inputs.api_id, inputs.api_key);
+  console.log(veracodeApp);
 }
 
 // export async function preparePolicyResults(inputs: Inputs): Promise<void> {
