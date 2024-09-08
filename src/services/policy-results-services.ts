@@ -2,6 +2,7 @@ import { VeracodeActionsInputs } from '../inputs';
 import * as VeracodePolicyResult from '../namespaces/VeracodePolicyResult';
 import { getApplicationFindings } from './findings-service';
 import { getApplicationByName } from './application-service';
+import { getGitLabIssues } from './gitlab-service';
 import * as VeracodeApplication from '../namespaces/VeracodeApplication';
 import { promises as fs } from 'fs'; // Using promises for asynchronous file operations
 import * as path from 'path'; // Import the path module
@@ -121,7 +122,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   if (!inputs.create_issue)
     return; // No need to create a GitLab issue, exit early 
 
-  await getExistingGitLabIssue(inputs.gitlab_token);
+  await getGitLabIssues(inputs.gitlab_token);
   
   console.log('Creating GitLab issue');
   const gitlabToken = inputs.gitlab_token;
@@ -140,13 +141,6 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   // Create a GitLab issue
   // Use the GitLab API to create an issue
   
-}
-
-async function getExistingGitLabIssue(gitlabToken: string): Promise<void> {
-  const apiUrl = process.env.CI_API_V4_URL;
-  console.log(apiUrl);
-  console.log(gitlabToken);
-  // Get all issues from the project
 }
 
 // Function to map severity values (optional)

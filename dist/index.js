@@ -77,9 +77,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.deleteResourceById = exports.getResourceByAttribute = void 0;
+exports.deleteResourceById = exports.getResourceByAttribute = exports.getGitLabResourceByAttribute = void 0;
 const veracode_hmac_1 = __nccwpck_require__(841);
 const app_config_1 = __importDefault(__nccwpck_require__(684));
+async function getGitLabResourceByAttribute(resource, gitlabToken) {
+    const resourceUri = resource.resourceUri;
+    const queryAttribute = resource.queryAttribute;
+    const queryValue = resource.queryValue;
+    const urlQueryParams = queryAttribute !== '' ? `?${queryAttribute}=${queryValue}` : '';
+    const headers = {
+        'PRIVATE-TOKEN': gitlabToken
+    };
+    const appUrl = `${resourceUri}${urlQueryParams}`;
+    try {
+        const response = await fetch(appUrl, { headers });
+        const data = await response.json();
+        return data;
+    }
+    catch (error) {
+        throw new Error('Failed to fetch resource.');
+    }
+}
+exports.getGitLabResourceByAttribute = getGitLabResourceByAttribute;
 async function getResourceByAttribute(vid, vkey, resource) {
     const resourceUri = resource.resourceUri;
     const queryAttribute = resource.queryAttribute;
@@ -431,6 +450,59 @@ exports.getApplicationFindings = getApplicationFindings;
 
 /***/ }),
 
+/***/ 903:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getGitLabIssues = void 0;
+const http = __importStar(__nccwpck_require__(740));
+async function getGitLabIssues(gitlabToken) {
+    const gitlabApiUrl = process.env.CI_API_V4_URL;
+    const gitlabProjectId = process.env.CI_PROJECT_ID;
+    try {
+        const getGitLabIssueResource = {
+            resourceUri: `${gitlabApiUrl}/projects/${gitlabProjectId}/issues`,
+            queryAttribute: 'per_page',
+            queryValue: encodeURIComponent(100),
+        };
+        console.log(getGitLabIssueResource);
+        const response = await http.getGitLabResourceByAttribute(getGitLabIssueResource, gitlabToken);
+        console.log(response);
+    }
+    catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+exports.getGitLabIssues = getGitLabIssues;
+
+
+/***/ }),
+
 /***/ 505:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -462,6 +534,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.preparePolicyResults = void 0;
 const findings_service_1 = __nccwpck_require__(747);
 const application_service_1 = __nccwpck_require__(560);
+const gitlab_service_1 = __nccwpck_require__(903);
 const fs_1 = __nccwpck_require__(147);
 const path = __importStar(__nccwpck_require__(17));
 const gitlabOutputFileName = 'output-sast-vulnerabilites.json';
@@ -559,7 +632,7 @@ async function preparePolicyResults(inputs) {
     }
     if (!inputs.create_issue)
         return;
-    await getExistingGitLabIssue(inputs.gitlab_token);
+    await (0, gitlab_service_1.getGitLabIssues)(inputs.gitlab_token);
     console.log('Creating GitLab issue');
     const gitlabToken = inputs.gitlab_token;
     console.log(gitlabToken);
@@ -575,11 +648,6 @@ async function preparePolicyResults(inputs) {
     console.log(commitSHA);
 }
 exports.preparePolicyResults = preparePolicyResults;
-async function getExistingGitLabIssue(gitlabToken) {
-    const apiUrl = process.env.CI_API_V4_URL;
-    console.log(apiUrl);
-    console.log(gitlabToken);
-}
 function getSeverity(weight) {
     switch (weight) {
         case 0:

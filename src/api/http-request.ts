@@ -12,6 +12,25 @@ interface ResourceById {
   resourceId: string;
 }
 
+export async function getGitLabResourceByAttribute<T>(resource: Resource, gitlabToken: string): Promise<T> {
+  const resourceUri = resource.resourceUri;
+  const queryAttribute = resource.queryAttribute;
+  const queryValue = resource.queryValue;
+
+  const urlQueryParams = queryAttribute !== '' ? `?${queryAttribute}=${queryValue}` : '';
+  const headers = {
+    'PRIVATE-TOKEN': gitlabToken
+  }
+  const appUrl = `${resourceUri}${urlQueryParams}`;
+  try {
+    const response = await fetch(appUrl, { headers });
+    const data = await response.json();
+    return data as T;
+  } catch (error) {
+    throw new Error('Failed to fetch resource.');
+  }
+}
+
 export async function getResourceByAttribute<T>(vid: string, vkey: string, resource: Resource): Promise<T> {
   const resourceUri = resource.resourceUri;
   const queryAttribute = resource.queryAttribute;
