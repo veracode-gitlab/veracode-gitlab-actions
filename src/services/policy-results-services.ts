@@ -38,10 +38,8 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
         // const method = finding.finding_details.procedure;
         let filePath = finding.finding_details.file_path;
         if (inputs.src_root && inputs.jsp_root) {
-          if (filePath.startsWith('/WEB-INF'))
-            filePath = inputs.jsp_root + filePath;
-          else
-            filePath = inputs.src_root + filePath;
+          if (filePath.startsWith('/WEB-INF')) filePath = inputs.jsp_root + filePath;
+          else filePath = inputs.src_root + filePath;
         }
 
         const jsonFinding = {
@@ -61,12 +59,14 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
             start_line: lineNumber,
             end_line: lineNumber,
           },
-          identifiers: {
-            type: 'CWE',
-            name: 'CWE-' + cwe,
-            value: cwe,
-            url: `https://cwe.mitre.org/data/definitions/${cwe}.html`,
-          },
+          identifiers: [
+            {
+              type: 'CWE',
+              name: 'CWE-' + cwe,
+              value: cwe,
+              url: `https://cwe.mitre.org/data/definitions/${cwe}.html`,
+            },
+          ],
         };
 
         jsonFindings.push(JSON.stringify(jsonFinding));

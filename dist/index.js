@@ -504,12 +504,14 @@ async function preparePolicyResults(inputs) {
                         start_line: lineNumber,
                         end_line: lineNumber,
                     },
-                    identifiers: {
-                        type: 'CWE',
-                        name: 'CWE-' + cwe,
-                        value: cwe,
-                        url: `https://cwe.mitre.org/data/definitions/${cwe}.html`,
-                    },
+                    identifiers: [
+                        {
+                            type: 'CWE',
+                            name: 'CWE-' + cwe,
+                            value: cwe,
+                            url: `https://cwe.mitre.org/data/definitions/${cwe}.html`,
+                        },
+                    ],
                 };
                 jsonFindings.push(JSON.stringify(jsonFinding));
             }
