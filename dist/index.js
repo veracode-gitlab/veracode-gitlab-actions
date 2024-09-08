@@ -435,15 +435,17 @@ async function preparePolicyResults(inputs) {
         for (const finding of findings) {
             if (finding.violates_policy) {
                 const severity = getSeverity(finding.finding_details.severity);
+                const description = processDescription(finding.description);
                 const jsonFinding = {
                     id: `${finding.issue_id}-${finding.context_guid}-${finding.build_id}`,
                     category: 'sast',
                     severity,
+                    description,
                 };
                 jsonFindings.push(JSON.stringify(jsonFinding));
             }
         }
-        const jsonEnd = `],"scan": {
+        const jsonEnd = `,"scan": {
         "analyzer": {
           "id": "veracodeSAST",
           "name": "Veracode SAST",
@@ -491,6 +493,12 @@ function getSeverity(weight) {
         default:
             return 'Unknown';
     }
+}
+function processDescription(description) {
+    description = description.replace(/<span>.*?<\/span>/g, '');
+    description = description.replace(/<a href=".*?">.*?<\/a>/g, '');
+    description = description.replace(/<[^>]*>/g, '');
+    return description;
 }
 
 

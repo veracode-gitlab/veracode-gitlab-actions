@@ -20,20 +20,20 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
     for (const finding of findings) {
       if (finding.violates_policy) {
         const severity = getSeverity(finding.finding_details.severity); // Use function for severity mapping
-        // const description = processDescription(finding.description); // Use function for description processing
+        const description = processDescription(finding.description); // Use function for description processing
 
         const jsonFinding = {
           id: `${finding.issue_id}-${finding.context_guid}-${finding.build_id}`,
           category: 'sast',
           severity,
-          // description,
+          description,
         };
 
         jsonFindings.push(JSON.stringify(jsonFinding));
       }
     }
 
-    const jsonEnd = `],"scan": {
+    const jsonEnd = `,"scan": {
         "analyzer": {
           "id": "veracodeSAST",
           "name": "Veracode SAST",
@@ -84,6 +84,19 @@ function getSeverity(weight: number) {
     default:
       return 'Unknown';
   }
+}
+
+function processDescription(description: string): string {
+    // Remove spans
+    description = description.replace(/<span>.*?<\/span>/g, '');
+
+    // Remove links
+    description = description.replace(/<a href=".*?">.*?<\/a>/g, '');
+  
+    // Remove other HTML elements (adjust the regex as needed)
+    description = description.replace(/<[^>]*>/g, '');
+  
+    return description;
 }
 
 // export async function preparePolicyResults(inputs: Inputs): Promise<void> {
