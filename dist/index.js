@@ -490,8 +490,8 @@ async function getGitLabIssues(gitlabToken) {
             queryValue: encodeURIComponent(100),
         };
         console.log(getGitLabIssueResource);
-        const response = await http.getGitLabResourceByAttribute(getGitLabIssueResource, gitlabToken);
-        console.log(response);
+        const gitlabIssues = await http.getGitLabResourceByAttribute(getGitLabIssueResource, gitlabToken);
+        console.log(gitlabIssues);
     }
     catch (error) {
         console.error(error);
