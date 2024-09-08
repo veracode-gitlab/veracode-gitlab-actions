@@ -39,8 +39,8 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
       const cwe = finding.finding_details.cwe.id;
       const cweName = finding.finding_details.cwe.name;
       const lineNumber = finding.finding_details.file_line_number;
-      // const method = finding.finding_details.procedure;
-      // const fileName = finding.finding_details.file_name;
+      const method = finding.finding_details.procedure;
+      const fileName = finding.finding_details.file_name;
       let filePath = finding.finding_details.file_path;
       if (inputs.src_root && inputs.jsp_root) {
         if (filePath.startsWith('/WEB-INF')) filePath = inputs.jsp_root + filePath;
@@ -55,6 +55,8 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
         cve: id,
         severity,
         description,
+        method,
+        fileName,
         scanner: {
           id: 'security_code_scan',
           name: 'Veracode Static Code Analysis',

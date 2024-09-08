@@ -14,6 +14,7 @@ export interface Finding {
             name: string;
         };
         file_path: string;
+        file_name: string;
         file_line_number: number;
         procedure: string;
     };
