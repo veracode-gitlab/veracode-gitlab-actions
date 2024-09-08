@@ -600,6 +600,9 @@ async function preparePolicyResults(inputs) {
             console.log(issueLabel);
             console.log(issueDescription);
             const gitlabIssue = {
+                id: 0,
+                iid: 0,
+                project_id: 0,
                 title: issueTitle,
                 description: issueDescription,
                 state: 'opened',
@@ -655,7 +658,9 @@ async function preparePolicyResults(inputs) {
         return;
     const existingGLIssues = await (0, gitlab_service_1.getGitLabIssues)(inputs.gitlab_token);
     console.log('Existing GitLab issues:', existingGLIssues);
-    console.log(gitlabIssuesToAdd);
+    for (const glIssue in gitlabIssuesToAdd) {
+        console.log(glIssue);
+    }
 }
 exports.preparePolicyResults = preparePolicyResults;
 function getSeverity(weight) {

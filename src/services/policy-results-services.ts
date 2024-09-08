@@ -28,7 +28,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   console.log('Json file will be created');
 
   const jsonFindings: string[] = []; // Array of stringified findings
-  const gitlabIssuesToAdd: GLIssue[] = []; // Array of GitLab issues to add
+  const gitlabIssuesToAdd = []; // Array of GitLab issues to add
 
   const projectURL = process.env.CI_PROJECT_URL;
   const commitSHA = process.env.CI_COMMIT_SHA;
@@ -88,10 +88,10 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
       console.log(issueLabel);
       console.log(issueDescription);
 
-      const gitlabIssue: GLIssue = {
-        // id: 0,
-        // iid: 0,
-        // project_id: 0,
+      const gitlabIssue = {
+        id: 0,
+        iid: 0,
+        project_id: 0,
         title: issueTitle,
         description: issueDescription,
         state: 'opened',
@@ -149,10 +149,13 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
 
   if (!inputs.create_issue) return; // No need to create a GitLab issue, exit early
 
-  const existingGLIssues = await getGitLabIssues(inputs.gitlab_token);
+  const existingGLIssues: GLIssue[] = await getGitLabIssues(inputs.gitlab_token);
   console.log('Existing GitLab issues:', existingGLIssues);
 
-  console.log(gitlabIssuesToAdd);
+  for(const glIssue in gitlabIssuesToAdd) {
+    // Check if the issue already exists
+    console.log(glIssue);
+  }
 
   // Create a GitLab issue
   // Use the GitLab API to create an issue
