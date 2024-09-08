@@ -544,7 +544,7 @@ async function preparePolicyResults(inputs) {
         return;
     console.log('Json file will be created');
     const jsonFindings = [];
-    const gitlabIssuesToAdd = [];
+    const gitlabIssuesArr = [];
     const projectURL = process.env.CI_PROJECT_URL;
     const commitSHA = process.env.CI_COMMIT_SHA;
     for (const finding of findings) {
@@ -610,7 +610,7 @@ async function preparePolicyResults(inputs) {
                 severity,
                 imported_from: 'Veracode SAST',
             };
-            gitlabIssuesToAdd.push(gitlabIssue);
+            gitlabIssuesArr.push(gitlabIssue);
         }
     }
     const startTime = new Date().toISOString().substring(0, 19);
@@ -657,10 +657,14 @@ async function preparePolicyResults(inputs) {
     if (!inputs.create_issue)
         return;
     const existingGLIssues = await (0, gitlab_service_1.getGitLabIssues)(inputs.gitlab_token);
-    console.log('Existing GitLab issues:', existingGLIssues);
-    for (const glIssue in gitlabIssuesToAdd) {
-        console.log(glIssue);
+    const gitlabIssuesToAdd = [];
+    for (const glIssue of gitlabIssuesArr) {
+        const existingIssue = existingGLIssues.find((issue) => issue.title === glIssue.title && issue.state === 'opened');
+        if (!existingIssue) {
+            gitlabIssuesToAdd.push(glIssue);
+        }
     }
+    console.log(gitlabIssuesToAdd);
 }
 exports.preparePolicyResults = preparePolicyResults;
 function getSeverity(weight) {

@@ -28,7 +28,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   console.log('Json file will be created');
 
   const jsonFindings: string[] = []; // Array of stringified findings
-  const gitlabIssuesToAdd = []; // Array of GitLab issues to add
+  const gitlabIssuesArr = []; // Array of GitLab issues to add
 
   const projectURL = process.env.CI_PROJECT_URL;
   const commitSHA = process.env.CI_COMMIT_SHA;
@@ -99,7 +99,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
         severity,
         imported_from: 'Veracode SAST',
       };
-      gitlabIssuesToAdd.push(gitlabIssue);
+      gitlabIssuesArr.push(gitlabIssue);
     }
   }
 
@@ -150,12 +150,17 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   if (!inputs.create_issue) return; // No need to create a GitLab issue, exit early
 
   const existingGLIssues: GLIssue[] = await getGitLabIssues(inputs.gitlab_token);
-  console.log('Existing GitLab issues:', existingGLIssues);
 
-  for(const glIssue in gitlabIssuesToAdd) {
+  const gitlabIssuesToAdd: GLIssue[] = [];
+  for(const glIssue of gitlabIssuesArr) {
     // Check if the issue already exists
-    console.log(glIssue);
+    const existingIssue = existingGLIssues.find((issue) => issue.title === glIssue.title && issue.state === 'opened');
+    if (!existingIssue) {
+      gitlabIssuesToAdd.push(glIssue);
+    }
   }
+
+  console.log(gitlabIssuesToAdd);
 
   // Create a GitLab issue
   // Use the GitLab API to create an issue
