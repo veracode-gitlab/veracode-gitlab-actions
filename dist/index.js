@@ -544,7 +544,6 @@ async function preparePolicyResults(inputs) {
         return;
     console.log('Json file will be created');
     const jsonFindings = [];
-    const startTime = new Date().toISOString().substring(0, 19);
     for (const finding of findings) {
         if (finding.violates_policy) {
             const id = finding.issue_id + '-' + finding.context_guid + '-' + finding.build_id;
@@ -589,6 +588,7 @@ async function preparePolicyResults(inputs) {
             jsonFindings.push(JSON.stringify(jsonFinding));
         }
     }
+    const startTime = new Date().toISOString().substring(0, 19);
     const jsonEnd = `,"scan": {
       "analyzer": {
         "id": "veracodeSAST",
@@ -631,7 +631,11 @@ async function preparePolicyResults(inputs) {
     }
     if (!inputs.create_issue)
         return;
-    await (0, gitlab_service_1.getGitLabIssues)(inputs.gitlab_token);
+    const existingGLIssues = await (0, gitlab_service_1.getGitLabIssues)(inputs.gitlab_token);
+    console.log(existingGLIssues);
+    console.log(jsonFindings);
+    console.log(typeof jsonFindings);
+    console.log('===================');
     console.log('Creating GitLab issue');
     const gitlabToken = inputs.gitlab_token;
     console.log(gitlabToken);

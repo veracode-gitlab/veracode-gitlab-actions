@@ -28,7 +28,6 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   console.log('Json file will be created');
 
   const jsonFindings: string[] = []; // Array of stringified findings
-  const startTime = new Date().toISOString().substring(0, 19); // Extract date and time without milliseconds
 
   for (const finding of findings) {
     if (finding.violates_policy) {
@@ -76,6 +75,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
     }
   }
 
+  const startTime = new Date().toISOString().substring(0, 19); // Extract date and time without milliseconds
   const jsonEnd = `,"scan": {
       "analyzer": {
         "id": "veracodeSAST",
@@ -122,7 +122,12 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   if (!inputs.create_issue)
     return; // No need to create a GitLab issue, exit early 
 
-  await getGitLabIssues(inputs.gitlab_token);
+  const existingGLIssues = await getGitLabIssues(inputs.gitlab_token);
+  console.log(existingGLIssues);
+  console.log(jsonFindings);
+  console.log(typeof jsonFindings);
+
+  console.log('===================');
   
   console.log('Creating GitLab issue');
   const gitlabToken = inputs.gitlab_token;
