@@ -430,17 +430,68 @@ async function preparePolicyResults(inputs) {
     const findings = await (0, findings_service_1.getApplicationFindings)(veracodeApp.guid, inputs.api_id, inputs.api_key);
     if (findings.length > 0) {
         console.log('Json file will be created');
-        let m = 0;
-        while (m < findings.length) {
-            const id = findings[m].issue_id + '-' + findings[m].context_guid + '-' + findings[m].build_id;
-            if (findings[m].violates_policy) {
-                console.log(id);
+        const jsonFindings = [];
+        const startTime = new Date().toISOString().substring(0, 19);
+        for (const finding of findings) {
+            if (finding.violates_policy) {
+                const severity = getSeverity(finding.finding_details.severity);
+                const jsonFinding = {
+                    id: `${finding.issue_id}-${finding.context_guid}-${finding.build_id}`,
+                    category: 'sast',
+                    severity,
+                };
+                jsonFindings.push(JSON.stringify(jsonFinding));
             }
-            m++;
         }
+        const jsonEnd = `],"scan": {
+        "analyzer": {
+          "id": "veracodeSAST",
+          "name": "Veracode SAST",
+          "url": "https://www.veracode.com",
+          "vendor": {
+            "name": "Veracode"
+          },
+          "version": "latest"
+        },
+        "scanner": {
+          "id": "veracodeSAST",
+          "name": "Veracode SAST",
+          "url": "https://www.veracode.com",
+          "vendor": {
+            "name": "Veracode"
+          },
+          "version": "latest"
+        },
+        "primary_identifiers": [],
+        "type": "sast",
+        "start_time": "${startTime}",
+        "end_time": "${startTime}",
+        "status": "success"
+      }
+    }`;
+        const fullReportJson = `{"version": "15.0.4","vulnerabilities": [${jsonFindings.join(',')}]${jsonEnd}`;
+        console.log(fullReportJson);
     }
 }
 exports.preparePolicyResults = preparePolicyResults;
+function getSeverity(weight) {
+    switch (weight) {
+        case 0:
+            return 'Info';
+        case 1:
+            return 'Unknown';
+        case 2:
+            return 'Low';
+        case 3:
+            return 'Medium';
+        case 4:
+            return 'High';
+        case 5:
+            return 'Critical';
+        default:
+            return 'Unknown';
+    }
+}
 
 
 /***/ }),

@@ -13,20 +13,76 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   {
     //always generate security tab json file
     console.log('Json file will be created')
-        
-    // const json_findings=[]
-    // const json_start = '{"version": "15.0.4","vulnerabilities": ['
 
-    // json findings
-    let m = 0;
-    while (m < findings.length) {
-      const id = findings[m].issue_id+'-'+findings[m].context_guid+'-'+findings[m].build_id;
-      if (findings[m].violates_policy) {
-        console.log(id);
+    const jsonFindings: string[] = []; // Array of stringified findings
+    const startTime = new Date().toISOString().substring(0, 19); // Extract date and time without milliseconds
+
+    for (const finding of findings) {
+      if (finding.violates_policy) {
+        const severity = getSeverity(finding.finding_details.severity); // Use function for severity mapping
+        // const description = processDescription(finding.description); // Use function for description processing
+
+        const jsonFinding = {
+          id: `${finding.issue_id}-${finding.context_guid}-${finding.build_id}`,
+          category: 'sast',
+          severity,
+          // description,
+        };
+
+        jsonFindings.push(JSON.stringify(jsonFinding));
       }
-      m++;
     }
 
+    const jsonEnd = `],"scan": {
+        "analyzer": {
+          "id": "veracodeSAST",
+          "name": "Veracode SAST",
+          "url": "https://www.veracode.com",
+          "vendor": {
+            "name": "Veracode"
+          },
+          "version": "latest"
+        },
+        "scanner": {
+          "id": "veracodeSAST",
+          "name": "Veracode SAST",
+          "url": "https://www.veracode.com",
+          "vendor": {
+            "name": "Veracode"
+          },
+          "version": "latest"
+        },
+        "primary_identifiers": [],
+        "type": "sast",
+        "start_time": "${startTime}",
+        "end_time": "${startTime}",
+        "status": "success"
+      }
+    }`;
+
+    const fullReportJson = `{"version": "15.0.4","vulnerabilities": [${jsonFindings.join(',')}]${jsonEnd}`;
+
+    console.log(fullReportJson);
+  }
+}
+
+// Function to map severity values (optional)
+function getSeverity(weight: number) {
+  switch (weight) {
+    case 0:
+      return 'Info';
+    case 1:
+      return 'Unknown';
+    case 2:
+      return 'Low';
+    case 3:
+      return 'Medium';
+    case 4:
+      return 'High';
+    case 5:
+      return 'Critical';
+    default:
+      return 'Unknown';
   }
 }
 
