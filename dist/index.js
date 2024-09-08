@@ -439,6 +439,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.preparePolicyResults = void 0;
 const findings_service_1 = __nccwpck_require__(747);
 const application_service_1 = __nccwpck_require__(560);
+const fs_1 = __nccwpck_require__(147);
+const gitlabOutputFileName = 'output-sast-vulnerabilites.json';
 async function preparePolicyResults(inputs) {
     const veracodeApp = await (0, application_service_1.getApplicationByName)(inputs.profile_name, inputs.api_id, inputs.api_key);
     const findings = await (0, findings_service_1.getApplicationFindings)(veracodeApp.guid, inputs.api_id, inputs.api_key);
@@ -515,7 +517,13 @@ async function preparePolicyResults(inputs) {
       }
     }`;
         const fullReportJson = `{"version": "15.0.4","vulnerabilities": [${jsonFindings.join(',')}]${jsonEnd}`;
-        console.log(fullReportJson);
+        try {
+            await fs_1.promises.writeFile(gitlabOutputFileName, fullReportJson);
+            console.log(`Json file written to: ${gitlabOutputFileName}`);
+        }
+        catch (error) {
+            console.error(`Error writing json file: ${error}`);
+        }
     }
 }
 exports.preparePolicyResults = preparePolicyResults;
@@ -551,6 +559,13 @@ function processDescription(description) {
 /***/ ((module) => {
 
 module.exports = require("crypto");
+
+/***/ }),
+
+/***/ 147:
+/***/ ((module) => {
+
+module.exports = require("fs");
 
 /***/ })
 

@@ -3,6 +3,9 @@ import * as VeracodePolicyResult from '../namespaces/VeracodePolicyResult';
 import { getApplicationFindings } from './findings-service';
 import { getApplicationByName } from './application-service';
 import * as VeracodeApplication from '../namespaces/VeracodeApplication';
+import { promises as fs } from 'fs'; // Using promises for asynchronous file operations
+
+const gitlabOutputFileName = 'output-sast-vulnerabilites.json';
 
 export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promise<void> {
   const veracodeApp: VeracodeApplication.Application = await getApplicationByName(
@@ -98,7 +101,12 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
 
     const fullReportJson = `{"version": "15.0.4","vulnerabilities": [${jsonFindings.join(',')}]${jsonEnd}`;
 
-    console.log(fullReportJson);
+    try {
+      await fs.writeFile(gitlabOutputFileName, fullReportJson);
+      console.log(`Json file written to: ${gitlabOutputFileName}`);
+    } catch (error) {
+      console.error(`Error writing json file: ${error}`);
+    }
   }
 }
 

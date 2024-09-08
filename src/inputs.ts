@@ -12,6 +12,8 @@ command args
 9 - required    - gitlab_project    = GITLAB PROJECT IP 
 10 - optional   - api_id            = VERACODE API ID
 11 - optional   - api_key           = VERACODE API KEY
+12 - optional   - src_root          = SRC_ROOT
+13 - optional   - jsp_root          = JSP_ROOT
 */
 
 export interface VeracodeActionsInputs {
