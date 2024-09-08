@@ -432,14 +432,38 @@ exports.getApplicationFindings = getApplicationFindings;
 /***/ }),
 
 /***/ 505:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.preparePolicyResults = void 0;
 const findings_service_1 = __nccwpck_require__(747);
 const application_service_1 = __nccwpck_require__(560);
 const fs_1 = __nccwpck_require__(147);
+const path = __importStar(__nccwpck_require__(17));
 const gitlabOutputFileName = 'output-sast-vulnerabilites.json';
 async function preparePolicyResults(inputs) {
     const veracodeApp = await (0, application_service_1.getApplicationByName)(inputs.profile_name, inputs.api_id, inputs.api_key);
@@ -517,9 +541,15 @@ async function preparePolicyResults(inputs) {
       }
     }`;
         const fullReportJson = `{"version": "15.0.4","vulnerabilities": [${jsonFindings.join(',')}]${jsonEnd}`;
+        const cwd = process.env.CI_PROJECT_DIR;
         try {
-            await fs_1.promises.writeFile(gitlabOutputFileName, fullReportJson);
-            console.log(`Json file written to: ${gitlabOutputFileName}`);
+            if (cwd) {
+                await fs_1.promises.writeFile(path.join(cwd, gitlabOutputFileName), fullReportJson);
+            }
+            else {
+                console.error('Error: CI_PROJECT_DIR environment variable is undefined.');
+            }
+            console.log(`Json file written to: ${path.join(cwd || '', gitlabOutputFileName)}`);
         }
         catch (error) {
             console.error(`Error writing json file: ${error}`);
@@ -566,6 +596,13 @@ module.exports = require("crypto");
 /***/ ((module) => {
 
 module.exports = require("fs");
+
+/***/ }),
+
+/***/ 17:
+/***/ ((module) => {
+
+module.exports = require("path");
 
 /***/ })
 

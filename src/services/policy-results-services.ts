@@ -4,6 +4,7 @@ import { getApplicationFindings } from './findings-service';
 import { getApplicationByName } from './application-service';
 import * as VeracodeApplication from '../namespaces/VeracodeApplication';
 import { promises as fs } from 'fs'; // Using promises for asynchronous file operations
+import * as path from 'path'; // Import the path module
 
 const gitlabOutputFileName = 'output-sast-vulnerabilites.json';
 
@@ -101,9 +102,16 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
 
     const fullReportJson = `{"version": "15.0.4","vulnerabilities": [${jsonFindings.join(',')}]${jsonEnd}`;
 
+    // Get the current working directory from the GitLab Runner environment variable
+    const cwd = process.env.CI_PROJECT_DIR;
+
     try {
-      await fs.writeFile(gitlabOutputFileName, fullReportJson);
-      console.log(`Json file written to: ${gitlabOutputFileName}`);
+      if (cwd) {
+        await fs.writeFile(path.join(cwd, gitlabOutputFileName), fullReportJson);
+      } else {
+        console.error('Error: CI_PROJECT_DIR environment variable is undefined.');
+      }
+      console.log(`Json file written to: ${path.join(cwd || '', gitlabOutputFileName)}`);
     } catch (error) {
       console.error(`Error writing json file: ${error}`);
     }
