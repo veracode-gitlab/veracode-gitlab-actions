@@ -428,13 +428,14 @@ const application_service_1 = __nccwpck_require__(560);
 async function preparePolicyResults(inputs) {
     const veracodeApp = await (0, application_service_1.getApplicationByName)(inputs.profile_name, inputs.api_id, inputs.api_key);
     const findings = await (0, findings_service_1.getApplicationFindings)(veracodeApp.guid, inputs.api_id, inputs.api_key);
-    console.log(findings);
     if (findings.length > 0) {
         console.log('Json file will be created');
         let m = 0;
         while (m < findings.length) {
             const id = findings[m].issue_id + '-' + findings[m].context_guid + '-' + findings[m].build_id;
-            console.log(id);
+            if (findings[m].violates_policy) {
+                console.log(id);
+            }
             m++;
         }
     }
