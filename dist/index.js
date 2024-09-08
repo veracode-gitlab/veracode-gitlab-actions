@@ -557,23 +557,29 @@ async function preparePolicyResults(inputs) {
     catch (error) {
         console.error(`Error writing json file: ${error}`);
     }
-    if (inputs.create_issue) {
-        console.log('Creating GitLab issue');
-        const gitlabToken = inputs.gitlab_token;
-        console.log(gitlabToken);
-        const projectURL = process.env.CI_PROJECT_URL;
-        console.log(projectURL);
-        const projectName = process.env.CI_PROJECT_NAME;
-        console.log(projectName);
-        const porjectID = process.env.CI_PROJECT_ID;
-        console.log(porjectID);
-        const projectPath = process.env.CI_PROJECT_PATH;
-        console.log(projectPath);
-        const commitSHA = process.env.CI_COMMIT_SHA;
-        console.log(commitSHA);
-    }
+    if (!inputs.create_issue)
+        return;
+    await getExistingGitLabIssue(inputs.gitlab_token);
+    console.log('Creating GitLab issue');
+    const gitlabToken = inputs.gitlab_token;
+    console.log(gitlabToken);
+    const projectURL = process.env.CI_PROJECT_URL;
+    console.log(projectURL);
+    const projectName = process.env.CI_PROJECT_NAME;
+    console.log(projectName);
+    const porjectID = process.env.CI_PROJECT_ID;
+    console.log(porjectID);
+    const projectPath = process.env.CI_PROJECT_PATH;
+    console.log(projectPath);
+    const commitSHA = process.env.CI_COMMIT_SHA;
+    console.log(commitSHA);
 }
 exports.preparePolicyResults = preparePolicyResults;
+async function getExistingGitLabIssue(gitlabToken) {
+    const apiUrl = process.env.CI_API_V4_URL;
+    console.log(apiUrl);
+    console.log(gitlabToken);
+}
 function getSeverity(weight) {
     switch (weight) {
         case 0:

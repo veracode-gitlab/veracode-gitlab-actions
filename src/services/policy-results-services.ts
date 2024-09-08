@@ -118,24 +118,35 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
     console.error(`Error writing json file: ${error}`);
   }
 
-  if (inputs.create_issue) {
-    console.log('Creating GitLab issue');
-    const gitlabToken = inputs.gitlab_token;
-    console.log(gitlabToken);
-    const projectURL = process.env.CI_PROJECT_URL;
-    console.log(projectURL);
-    const projectName = process.env.CI_PROJECT_NAME;
-    console.log(projectName);
-    const porjectID = process.env.CI_PROJECT_ID;
-    console.log(porjectID);
-    const projectPath = process.env.CI_PROJECT_PATH;
-    console.log(projectPath);
-    const commitSHA = process.env.CI_COMMIT_SHA;
-    console.log(commitSHA);
-    
-    // Create a GitLab issue
-    // Use the GitLab API to create an issue
-  }
+  if (!inputs.create_issue)
+    return; // No need to create a GitLab issue, exit early 
+
+  await getExistingGitLabIssue(inputs.gitlab_token);
+  
+  console.log('Creating GitLab issue');
+  const gitlabToken = inputs.gitlab_token;
+  console.log(gitlabToken);
+  const projectURL = process.env.CI_PROJECT_URL;
+  console.log(projectURL);
+  const projectName = process.env.CI_PROJECT_NAME;
+  console.log(projectName);
+  const porjectID = process.env.CI_PROJECT_ID;
+  console.log(porjectID);
+  const projectPath = process.env.CI_PROJECT_PATH;
+  console.log(projectPath);
+  const commitSHA = process.env.CI_COMMIT_SHA;
+  console.log(commitSHA);
+
+  // Create a GitLab issue
+  // Use the GitLab API to create an issue
+  
+}
+
+async function getExistingGitLabIssue(gitlabToken: string): Promise<void> {
+  const apiUrl = process.env.CI_API_V4_URL;
+  console.log(apiUrl);
+  console.log(gitlabToken);
+  // Get all issues from the project
 }
 
 // Function to map severity values (optional)
