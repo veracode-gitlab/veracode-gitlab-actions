@@ -489,9 +489,8 @@ async function getGitLabIssues(gitlabToken) {
             queryAttribute: 'per_page',
             queryValue: encodeURIComponent(100),
         };
-        console.log(getGitLabIssueResource);
         const gitlabIssues = await http.getGitLabResourceByAttribute(getGitLabIssueResource, gitlabToken);
-        console.log(gitlabIssues);
+        return gitlabIssues;
     }
     catch (error) {
         console.error(error);
