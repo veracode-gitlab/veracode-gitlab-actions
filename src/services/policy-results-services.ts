@@ -1,14 +1,14 @@
-// import * as core from '@actions/core';
-// import { Octokit } from '@octokit/rest';
-// import * as fs from 'fs/promises';
 import { VeracodeActionsInputs } from '../inputs';
-// import * as VeracodePolicyResult from '../namespaces/VeracodePolicyResult';
-// import * as Checks from '../namespaces/Checks';
+import * as VeracodePolicyResult from '../namespaces/VeracodePolicyResult';
+import { getApplicationFindings } from './findings-service';
 import { getApplicationByName } from './application-service';
+import * as VeracodeApplication from '../namespaces/VeracodeApplication';
+
 
 export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promise<void> {
-  const veracodeApp = await getApplicationByName(inputs.profile_name, inputs.api_id, inputs.api_key);
-  console.log(veracodeApp);
+  const veracodeApp: VeracodeApplication.Application = await getApplicationByName(inputs.profile_name, inputs.api_id, inputs.api_key);
+  const findings: VeracodePolicyResult.Finding[] = await getApplicationFindings(veracodeApp.guid, inputs.api_id, inputs.api_key);
+  console.log(findings);
 }
 
 // export async function preparePolicyResults(inputs: Inputs): Promise<void> {

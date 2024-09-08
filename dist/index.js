@@ -369,16 +369,66 @@ exports.getApplicationByName = getApplicationByName;
 
 /***/ }),
 
+/***/ 747:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getApplicationFindings = void 0;
+const app_config_1 = __importDefault(__nccwpck_require__(684));
+const http = __importStar(__nccwpck_require__(740));
+async function getApplicationFindings(appGuid, vid, vkey) {
+    const getPolicyFindingsByApplicationResource = {
+        resourceUri: `${app_config_1.default.findingsUri}/${appGuid}/findings`,
+        queryAttribute: 'size',
+        queryValue: '1000',
+    };
+    const findingsResponse = await http.getResourceByAttribute(vid, vkey, getPolicyFindingsByApplicationResource);
+    return findingsResponse._embedded.findings;
+}
+exports.getApplicationFindings = getApplicationFindings;
+
+
+/***/ }),
+
 /***/ 505:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.preparePolicyResults = void 0;
+const findings_service_1 = __nccwpck_require__(747);
 const application_service_1 = __nccwpck_require__(560);
 async function preparePolicyResults(inputs) {
     const veracodeApp = await (0, application_service_1.getApplicationByName)(inputs.profile_name, inputs.api_id, inputs.api_key);
-    console.log(veracodeApp);
+    const findings = await (0, findings_service_1.getApplicationFindings)(veracodeApp.guid, inputs.api_id, inputs.api_key);
+    console.log(findings);
 }
 exports.preparePolicyResults = preparePolicyResults;
 
