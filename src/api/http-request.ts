@@ -19,8 +19,8 @@ export async function getGitLabResourceByAttribute<T>(resource: Resource, gitlab
 
   const urlQueryParams = queryAttribute !== '' ? `?${queryAttribute}=${queryValue}` : '';
   const headers = {
-    'PRIVATE-TOKEN': gitlabToken
-  }
+    'PRIVATE-TOKEN': gitlabToken,
+  };
   const appUrl = `${resourceUri}${urlQueryParams}`;
   try {
     const response = await fetch(appUrl, { headers });

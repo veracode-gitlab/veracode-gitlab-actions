@@ -21,8 +21,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
     inputs.api_key,
   );
 
-  if (findings.length === 0)
-    return; // No findings to process, exit early
+  if (findings.length === 0) return; // No findings to process, exit early
 
   //generate security tab json file
   console.log('Json file will be created');
@@ -124,8 +123,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
     console.error(`Error writing json file: ${error}`);
   }
 
-  if (!inputs.create_issue)
-    return; // No need to create a GitLab issue, exit early 
+  if (!inputs.create_issue) return; // No need to create a GitLab issue, exit early
 
   const existingGLIssues = await getGitLabIssues(inputs.gitlab_token);
   console.log('Existing GitLab issues:', existingGLIssues);
@@ -134,17 +132,30 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   const commitSHA = process.env.CI_COMMIT_SHA;
 
   for (const finding of findings) {
-    const issueTitle = `Static Code Analysis - ${finding.finding_details.file_name}:${finding.finding_details.file_line_number} - Severity: ${getSeverity(finding.finding_details.severity)} - CWE: ${finding.finding_details.cwe.id}: ${finding.finding_details.cwe.name}`;
-    const issueLabel = `Static Code Ananlysis,CWE:${finding.finding_details.cwe.id},${getSeverity(finding.finding_details.severity)}`;
-    const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${processDescription(finding.description)} \n* ${finding.finding_details.cwe.name}:${finding.finding_details.cwe.id} \n* File Path: [${finding.finding_details.file_path}:${finding.finding_details.file_line_number}](${projectURL}/-/blob/${commitSHA}/${finding.finding_details.file_path}#L${finding.finding_details.file_line_number}) \n* Scanner: Veracode Sast Scan`;
-    console.log(issueTitle);
-    console.log(issueLabel);
-    console.log(issueDescription);
+    if (finding.violates_policy) {
+      const severity = getSeverity(finding.finding_details.severity); // Use function for severity mapping
+      const description = processDescription(finding.description); // Use function for description processing
+      const cwe = finding.finding_details.cwe.id;
+      const cweName = finding.finding_details.cwe.name;
+      const lineNumber = finding.finding_details.file_line_number;
+      const fileName = finding.finding_details.file_name;
+      let filePath = finding.finding_details.file_path;
+      if (inputs.src_root && inputs.jsp_root) {
+        if (filePath.startsWith('/WEB-INF')) filePath = inputs.jsp_root + filePath;
+        else filePath = inputs.src_root + filePath;
+      }
+
+      const issueTitle = `Static Code Analysis - ${fileName}:${lineNumber} - Severity: ${severity} - CWE-${cwe}: ${cweName}`;
+      const issueLabel = `Static Code Ananlysis,CWE:${cwe},${severity}`;
+      const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${description} \n* ${cweName}:${cwe} \n* File Path: [${filePath}:${lineNumber}](${projectURL}/-/blob/${commitSHA}/${filePath}#L${lineNumber}) \n* Scanner: Veracode Sast Scan`;
+      console.log(issueTitle);
+      console.log(issueLabel);
+      console.log(issueDescription);
+    }
   }
-  
+
   // Create a GitLab issue
   // Use the GitLab API to create an issue
-  
 }
 
 // Function to map severity values (optional)

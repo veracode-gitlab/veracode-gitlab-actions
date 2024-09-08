@@ -86,7 +86,7 @@ async function getGitLabResourceByAttribute(resource, gitlabToken) {
     const queryValue = resource.queryValue;
     const urlQueryParams = queryAttribute !== '' ? `?${queryAttribute}=${queryValue}` : '';
     const headers = {
-        'PRIVATE-TOKEN': gitlabToken
+        'PRIVATE-TOKEN': gitlabToken,
     };
     const appUrl = `${resourceUri}${urlQueryParams}`;
     try {
@@ -642,12 +642,27 @@ async function preparePolicyResults(inputs) {
     const projectURL = process.env.CI_PROJECT_URL;
     const commitSHA = process.env.CI_COMMIT_SHA;
     for (const finding of findings) {
-        const issueTitle = `Static Code Analysis - ${finding.finding_details.file_name}:${finding.finding_details.file_line_number} - Severity: ${getSeverity(finding.finding_details.severity)} - CWE: ${finding.finding_details.cwe.id}: ${finding.finding_details.cwe.name}`;
-        const issueLabel = `Static Code Ananlysis,CWE:${finding.finding_details.cwe.id},${getSeverity(finding.finding_details.severity)}`;
-        const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${processDescription(finding.description)} \n* ${finding.finding_details.cwe.name}:${finding.finding_details.cwe.id} \n* File Path: [${finding.finding_details.file_path}:${finding.finding_details.file_line_number}](${projectURL}/-/blob/${commitSHA}/${finding.finding_details.file_path}#L${finding.finding_details.file_line_number}) \n* Scanner: Veracode Sast Scan`;
-        console.log(issueTitle);
-        console.log(issueLabel);
-        console.log(issueDescription);
+        if (finding.violates_policy) {
+            const severity = getSeverity(finding.finding_details.severity);
+            const description = processDescription(finding.description);
+            const cwe = finding.finding_details.cwe.id;
+            const cweName = finding.finding_details.cwe.name;
+            const lineNumber = finding.finding_details.file_line_number;
+            const fileName = finding.finding_details.file_name;
+            let filePath = finding.finding_details.file_path;
+            if (inputs.src_root && inputs.jsp_root) {
+                if (filePath.startsWith('/WEB-INF'))
+                    filePath = inputs.jsp_root + filePath;
+                else
+                    filePath = inputs.src_root + filePath;
+            }
+            const issueTitle = `Static Code Analysis - ${fileName}:${lineNumber} - Severity: ${severity} - CWE-${cwe}: ${cweName}`;
+            const issueLabel = `Static Code Ananlysis,CWE:${cwe},${severity}`;
+            const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${description} \n* ${cweName}:${cwe} \n* File Path: [${filePath}:${lineNumber}](${projectURL}/-/blob/${commitSHA}/${filePath}#L${lineNumber}) \n* Scanner: Veracode Sast Scan`;
+            console.log(issueTitle);
+            console.log(issueLabel);
+            console.log(issueDescription);
+        }
     }
 }
 exports.preparePolicyResults = preparePolicyResults;
