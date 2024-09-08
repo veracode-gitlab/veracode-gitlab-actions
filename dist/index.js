@@ -14,6 +14,7 @@ const parseInputs = (getInput) => {
         const [key, value] = input.split('=');
         inputMap[key] = value;
     });
+    console.log(inputMap);
     const action = inputMap.action;
     const scan_type = inputMap.scan_type;
     const profile_name = inputMap.profile_name;
@@ -61,6 +62,7 @@ const policyResultsService = __importStar(__nccwpck_require__(505));
 const inputs_1 = __nccwpck_require__(128);
 async function run() {
     const myArgs = process.argv.slice(2);
+    console.log(myArgs);
     const inputs = (0, inputs_1.parseInputs)(myArgs);
     console.log(inputs);
     switch (inputs.action) {

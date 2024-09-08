@@ -30,6 +30,8 @@ export const parseInputs = (getInput: string[]): VeracodeActionsInputs => {
     inputMap[key] = value;
   });
 
+  console.log(inputMap);
+
   // Extract values and perform type conversions
   const action = inputMap.action;
   const scan_type = inputMap.scan_type;
