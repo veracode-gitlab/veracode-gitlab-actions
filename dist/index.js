@@ -495,9 +495,9 @@ function getSeverity(weight) {
     }
 }
 function processDescription(description) {
-    description = description.replace(/<span>.*?<\/span>/g, '');
-    description = description.replace(/<a href=".*?">.*?<\/a>/g, '');
-    description = description.replace(/<[^>]*>/g, '');
+    description = description.replace(/<span[^>]*>(.*?)<\/span>/g, '$1');
+    description = description.replace(/<a href="([^"]+)">(.*?)<\/a>/g, '$2 ($1)');
+    description = description.replace('References:', '\nReferences:');
     return description;
 }
 
