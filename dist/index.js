@@ -638,21 +638,17 @@ async function preparePolicyResults(inputs) {
     if (!inputs.create_issue)
         return;
     const existingGLIssues = await (0, gitlab_service_1.getGitLabIssues)(inputs.gitlab_token);
-    console.log(existingGLIssues);
-    console.log('===================');
-    console.log('Creating GitLab issue');
-    const gitlabToken = inputs.gitlab_token;
-    console.log(gitlabToken);
+    console.log('Existing GitLab issues:', existingGLIssues);
     const projectURL = process.env.CI_PROJECT_URL;
-    console.log(projectURL);
-    const projectName = process.env.CI_PROJECT_NAME;
-    console.log(projectName);
-    const porjectID = process.env.CI_PROJECT_ID;
-    console.log(porjectID);
-    const projectPath = process.env.CI_PROJECT_PATH;
-    console.log(projectPath);
     const commitSHA = process.env.CI_COMMIT_SHA;
-    console.log(commitSHA);
+    for (const finding of findings) {
+        const issueTitle = `Static Code Analysis - ${finding.finding_details.file_name}:${finding.finding_details.file_line_number} - Severity: ${getSeverity(finding.finding_details.severity)} - CWE: ${finding.finding_details.cwe.id}: ${finding.finding_details.cwe.name}`;
+        const issueLabel = `Static Code Ananlysis,CWE:${finding.finding_details.cwe.id},${getSeverity(finding.finding_details.severity)}`;
+        const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${processDescription(finding.description)} \n* ${finding.finding_details.cwe.name}:${finding.finding_details.cwe.id} \n* File Path: [${finding.finding_details.file_path}:${finding.finding_details.file_line_number}](${projectURL}/-/blob/${commitSHA}/${finding.finding_details.file_path}#L${finding.finding_details.file_line_number}) \n* Scanner: Veracode Sast Scan`;
+        console.log(issueTitle);
+        console.log(issueLabel);
+        console.log(issueDescription);
+    }
 }
 exports.preparePolicyResults = preparePolicyResults;
 function getSeverity(weight) {

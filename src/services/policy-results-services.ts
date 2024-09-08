@@ -128,23 +128,20 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
     return; // No need to create a GitLab issue, exit early 
 
   const existingGLIssues = await getGitLabIssues(inputs.gitlab_token);
-  console.log(existingGLIssues);
-  console.log('===================');
-  
-  console.log('Creating GitLab issue');
-  const gitlabToken = inputs.gitlab_token;
-  console.log(gitlabToken);
-  const projectURL = process.env.CI_PROJECT_URL;
-  console.log(projectURL);
-  const projectName = process.env.CI_PROJECT_NAME;
-  console.log(projectName);
-  const porjectID = process.env.CI_PROJECT_ID;
-  console.log(porjectID);
-  const projectPath = process.env.CI_PROJECT_PATH;
-  console.log(projectPath);
-  const commitSHA = process.env.CI_COMMIT_SHA;
-  console.log(commitSHA);
+  console.log('Existing GitLab issues:', existingGLIssues);
 
+  const projectURL = process.env.CI_PROJECT_URL;
+  const commitSHA = process.env.CI_COMMIT_SHA;
+
+  for (const finding of findings) {
+    const issueTitle = `Static Code Analysis - ${finding.finding_details.file_name}:${finding.finding_details.file_line_number} - Severity: ${getSeverity(finding.finding_details.severity)} - CWE: ${finding.finding_details.cwe.id}: ${finding.finding_details.cwe.name}`;
+    const issueLabel = `Static Code Ananlysis,CWE:${finding.finding_details.cwe.id},${getSeverity(finding.finding_details.severity)}`;
+    const issueDescription = `### Static Code Analysis \n \n \n###  Description:  \n${processDescription(finding.description)} \n* ${finding.finding_details.cwe.name}:${finding.finding_details.cwe.id} \n* File Path: [${finding.finding_details.file_path}:${finding.finding_details.file_line_number}](${projectURL}/-/blob/${commitSHA}/${finding.finding_details.file_path}#L${finding.finding_details.file_line_number}) \n* Scanner: Veracode Sast Scan`;
+    console.log(issueTitle);
+    console.log(issueLabel);
+    console.log(issueDescription);
+  }
+  
   // Create a GitLab issue
   // Use the GitLab API to create an issue
   
