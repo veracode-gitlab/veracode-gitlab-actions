@@ -161,7 +161,8 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   await Promise.all(
     gitlabIssuesToAdd.map(async (issue) => {
       try {
-        await createGitLabIssue(inputs.gitlab_token, issue);
+        const response = await createGitLabIssue(inputs.gitlab_token, issue);
+        console.log(`Issues is: ${issue}, GitLab issue created: ${response}`);
       } catch (error) {
         console.error(`Error creating GitLab issue: ${error}`);
       }

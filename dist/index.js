@@ -696,7 +696,8 @@ async function preparePolicyResults(inputs) {
     }
     await Promise.all(gitlabIssuesToAdd.map(async (issue) => {
         try {
-            await (0, gitlab_service_1.createGitLabIssue)(inputs.gitlab_token, issue);
+            const response = await (0, gitlab_service_1.createGitLabIssue)(inputs.gitlab_token, issue);
+            console.log(`Issues is: ${issue}, GitLab issue created: ${response}`);
         }
         catch (error) {
             console.error(`Error creating GitLab issue: ${error}`);
