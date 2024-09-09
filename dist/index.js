@@ -2,7 +2,7 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 780:
+/***/ 484:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var sjcl={cipher:{},hash:{},keyexchange:{},mode:{},misc:{},codec:{},exception:{corrupt:function(a){this.toString=function(){return"CORRUPT: "+this.message};this.message=a},invalid:function(a){this.toString=function(){return"INVALID: "+this.message};this.message=a},bug:function(a){this.toString=function(){return"BUG: "+this.message};this.message=a},notReady:function(a){this.toString=function(){return"NOT READY: "+this.message};this.message=a}}};
@@ -69,7 +69,7 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
 
 /***/ }),
 
-/***/ 740:
+/***/ 853:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
@@ -77,9 +77,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.deleteResourceById = exports.getResourceByAttribute = exports.getGitLabResourceByAttribute = exports.createGitLabResource = void 0;
-const veracode_hmac_1 = __nccwpck_require__(841);
-const app_config_1 = __importDefault(__nccwpck_require__(684));
+exports.createGitLabResource = createGitLabResource;
+exports.getGitLabResourceByAttribute = getGitLabResourceByAttribute;
+exports.getResourceByAttribute = getResourceByAttribute;
+exports.deleteResourceById = deleteResourceById;
+const veracode_hmac_1 = __nccwpck_require__(760);
+const app_config_1 = __importDefault(__nccwpck_require__(135));
 async function createGitLabResource(resource, gitlabToken) {
     const resourceUri = resource.resourceUri;
     const body = resource.body;
@@ -95,7 +98,6 @@ async function createGitLabResource(resource, gitlabToken) {
         throw new Error('Failed to create resource.');
     }
 }
-exports.createGitLabResource = createGitLabResource;
 async function getGitLabResourceByAttribute(resource, gitlabToken) {
     const resourceUri = resource.resourceUri;
     const queryAttribute = resource.queryAttribute;
@@ -114,7 +116,6 @@ async function getGitLabResourceByAttribute(resource, gitlabToken) {
         throw new Error('Failed to fetch resource.');
     }
 }
-exports.getGitLabResourceByAttribute = getGitLabResourceByAttribute;
 async function getResourceByAttribute(vid, vkey, resource) {
     const resourceUri = resource.resourceUri;
     const queryAttribute = resource.queryAttribute;
@@ -140,7 +141,6 @@ async function getResourceByAttribute(vid, vkey, resource) {
         throw new Error('Failed to fetch resource.');
     }
 }
-exports.getResourceByAttribute = getResourceByAttribute;
 async function deleteResourceById(vid, vkey, resource) {
     const resourceUri = resource.resourceUri;
     const resourceId = resource.resourceId;
@@ -163,12 +163,11 @@ async function deleteResourceById(vid, vkey, resource) {
         throw new Error('Failed to delete resource.');
     }
 }
-exports.deleteResourceById = deleteResourceById;
 
 
 /***/ }),
 
-/***/ 841:
+/***/ 760:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
@@ -199,8 +198,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.calculateAuthorizationHeader = void 0;
-const sjcl_1 = __importDefault(__nccwpck_require__(780));
+exports.calculateAuthorizationHeader = calculateAuthorizationHeader;
+const sjcl_1 = __importDefault(__nccwpck_require__(484));
 const crypto = __importStar(__nccwpck_require__(113));
 const authorizationScheme = 'VERACODE-HMAC-SHA-256';
 const requestVersion = 'vcode_request_version_1';
@@ -234,12 +233,11 @@ function calculateAuthorizationHeader(params) {
     const header = authorizationScheme + ' ' + authorizationParam;
     return header;
 }
-exports.calculateAuthorizationHeader = calculateAuthorizationHeader;
 
 
 /***/ }),
 
-/***/ 684:
+/***/ 135:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -255,7 +253,7 @@ exports["default"] = appConfig;
 
 /***/ }),
 
-/***/ 128:
+/***/ 998:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -309,7 +307,7 @@ exports.parseInputs = parseInputs;
 
 /***/ }),
 
-/***/ 698:
+/***/ 22:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
@@ -337,9 +335,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = void 0;
-const policyResultsService = __importStar(__nccwpck_require__(505));
-const inputs_1 = __nccwpck_require__(128);
+exports.run = run;
+const policyResultsService = __importStar(__nccwpck_require__(404));
+const inputs_1 = __nccwpck_require__(998);
 async function run() {
     const myArgs = process.argv.slice(2);
     const inputs = (0, inputs_1.parseInputs)(myArgs);
@@ -351,189 +349,6 @@ async function run() {
             throw new Error('Invalid action');
     }
 }
-exports.run = run;
-
-
-/***/ }),
-
-/***/ 560:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getApplicationByName = void 0;
-const app_config_1 = __importDefault(__nccwpck_require__(684));
-const http = __importStar(__nccwpck_require__(740));
-async function getApplicationByName(appname, vid, vkey) {
-    var _a;
-    try {
-        const getApplicationByNameResource = {
-            resourceUri: app_config_1.default.applicationUri,
-            queryAttribute: 'name',
-            queryValue: encodeURIComponent(appname),
-        };
-        const applicationResponse = await http.getResourceByAttribute(vid, vkey, getApplicationByNameResource);
-        const applications = ((_a = applicationResponse._embedded) === null || _a === void 0 ? void 0 : _a.applications) || [];
-        if (applications.length === 0) {
-            throw new Error(`No application found with name ${appname}`);
-        }
-        else if (applications.length > 1) {
-            console.log(`Multiple applications found with name ${appname}, selecting the first found`);
-        }
-        return applications[0];
-    }
-    catch (error) {
-        console.error(error);
-        throw error;
-    }
-}
-exports.getApplicationByName = getApplicationByName;
-
-
-/***/ }),
-
-/***/ 747:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getApplicationFindings = void 0;
-const app_config_1 = __importDefault(__nccwpck_require__(684));
-const http = __importStar(__nccwpck_require__(740));
-async function getApplicationFindings(appGuid, vid, vkey) {
-    const getPolicyFindingsByApplicationResource = {
-        resourceUri: `${app_config_1.default.findingsUri}/${appGuid}/findings`,
-        queryAttribute: 'size',
-        queryValue: '1000',
-    };
-    const findingsResponse = await http.getResourceByAttribute(vid, vkey, getPolicyFindingsByApplicationResource);
-    return findingsResponse._embedded.findings;
-}
-exports.getApplicationFindings = getApplicationFindings;
-
-
-/***/ }),
-
-/***/ 903:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createGitLabIssue = exports.getGitLabIssues = void 0;
-const http = __importStar(__nccwpck_require__(740));
-async function getGitLabIssues(gitlabToken) {
-    const gitlabApiUrl = process.env.CI_API_V4_URL;
-    const gitlabProjectId = process.env.CI_PROJECT_ID;
-    try {
-        const getGitLabIssueResource = {
-            resourceUri: `${gitlabApiUrl}/projects/${gitlabProjectId}/issues`,
-            queryAttribute: 'per_page',
-            queryValue: encodeURIComponent(100),
-        };
-        const gitlabIssues = await http.getGitLabResourceByAttribute(getGitLabIssueResource, gitlabToken);
-        return gitlabIssues;
-    }
-    catch (error) {
-        console.error(error);
-        throw error;
-    }
-}
-exports.getGitLabIssues = getGitLabIssues;
-async function createGitLabIssue(gitlabToken, issue) {
-    const gitlabApiUrl = process.env.CI_API_V4_URL;
-    const gitlabProjectId = process.env.CI_PROJECT_ID;
-    try {
-        const createIssueResource = {
-            resourceUri: `${gitlabApiUrl}/projects/${gitlabProjectId}/issues`,
-            body: {
-                title: issue.title,
-                description: issue.description,
-                labels: issue.labels,
-            },
-        };
-        await http.createGitLabResource(createIssueResource, gitlabToken);
-    }
-    catch (error) {
-        console.error(error);
-        throw error;
-    }
-}
-exports.createGitLabIssue = createGitLabIssue;
 
 
 /***/ }),
@@ -565,11 +380,190 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.preparePolicyResults = void 0;
-const findings_service_1 = __nccwpck_require__(747);
-const application_service_1 = __nccwpck_require__(560);
-const gitlab_service_1 = __nccwpck_require__(903);
+exports.getApplicationByName = getApplicationByName;
+const app_config_1 = __importDefault(__nccwpck_require__(135));
+const http = __importStar(__nccwpck_require__(853));
+async function getApplicationByName(appname, vid, vkey) {
+    var _a;
+    try {
+        const getApplicationByNameResource = {
+            resourceUri: app_config_1.default.applicationUri,
+            queryAttribute: 'name',
+            queryValue: encodeURIComponent(appname),
+        };
+        const applicationResponse = await http.getResourceByAttribute(vid, vkey, getApplicationByNameResource);
+        const applications = ((_a = applicationResponse._embedded) === null || _a === void 0 ? void 0 : _a.applications) || [];
+        if (applications.length === 0) {
+            throw new Error(`No application found with name ${appname}`);
+        }
+        else if (applications.length > 1) {
+            console.log(`Multiple applications found with name ${appname}, selecting the first found`);
+        }
+        return applications[0];
+    }
+    catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+
+/***/ }),
+
+/***/ 502:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getApplicationFindings = getApplicationFindings;
+const app_config_1 = __importDefault(__nccwpck_require__(135));
+const http = __importStar(__nccwpck_require__(853));
+async function getApplicationFindings(appGuid, vid, vkey) {
+    const getPolicyFindingsByApplicationResource = {
+        resourceUri: `${app_config_1.default.findingsUri}/${appGuid}/findings`,
+        queryAttribute: 'size',
+        queryValue: '1000',
+    };
+    const findingsResponse = await http.getResourceByAttribute(vid, vkey, getPolicyFindingsByApplicationResource);
+    return findingsResponse._embedded.findings;
+}
+
+
+/***/ }),
+
+/***/ 902:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getGitLabIssues = getGitLabIssues;
+exports.createGitLabIssue = createGitLabIssue;
+const http = __importStar(__nccwpck_require__(853));
+async function getGitLabIssues(gitlabToken) {
+    const gitlabApiUrl = process.env.CI_API_V4_URL;
+    const gitlabProjectId = process.env.CI_PROJECT_ID;
+    try {
+        const getGitLabIssueResource = {
+            resourceUri: `${gitlabApiUrl}/projects/${gitlabProjectId}/issues`,
+            queryAttribute: 'per_page',
+            queryValue: encodeURIComponent(100),
+        };
+        const gitlabIssues = await http.getGitLabResourceByAttribute(getGitLabIssueResource, gitlabToken);
+        return gitlabIssues;
+    }
+    catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+async function createGitLabIssue(gitlabToken, issue) {
+    const gitlabApiUrl = process.env.CI_API_V4_URL;
+    const gitlabProjectId = process.env.CI_PROJECT_ID;
+    try {
+        const createIssueResource = {
+            resourceUri: `${gitlabApiUrl}/projects/${gitlabProjectId}/issues`,
+            body: {
+                title: issue.title,
+                description: issue.description,
+                labels: issue.labels,
+            },
+        };
+        await http.createGitLabResource(createIssueResource, gitlabToken);
+    }
+    catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+
+/***/ }),
+
+/***/ 404:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.preparePolicyResults = preparePolicyResults;
+const findings_service_1 = __nccwpck_require__(502);
+const application_service_1 = __nccwpck_require__(505);
+const gitlab_service_1 = __nccwpck_require__(902);
 const fs_1 = __nccwpck_require__(147);
 const path = __importStar(__nccwpck_require__(17));
 const gitlabOutputFileName = 'output-sast-vulnerabilites.json';
@@ -591,7 +585,6 @@ async function preparePolicyResults(inputs) {
             const cwe = finding.finding_details.cwe.id;
             const cweName = finding.finding_details.cwe.name;
             const lineNumber = finding.finding_details.file_line_number;
-            const method = finding.finding_details.procedure;
             const fileName = finding.finding_details.file_name;
             let filePath = finding.finding_details.file_path;
             if (inputs.src_root && inputs.jsp_root) {
@@ -608,8 +601,6 @@ async function preparePolicyResults(inputs) {
                 cve: id,
                 severity,
                 description,
-                method,
-                fileName,
                 scanner: {
                     id: 'security_code_scan',
                     name: 'Veracode Static Code Analysis',
@@ -704,7 +695,6 @@ async function preparePolicyResults(inputs) {
         }
     }));
 }
-exports.preparePolicyResults = preparePolicyResults;
 function getSeverity(weight) {
     switch (weight) {
         case 0:
@@ -798,7 +788,7 @@ var __webpack_exports__ = {};
 var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const main_1 = __nccwpck_require__(698);
+const main_1 = __nccwpck_require__(22);
 void (0, main_1.run)();
 
 })();

@@ -41,7 +41,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
       const cwe = finding.finding_details.cwe.id;
       const cweName = finding.finding_details.cwe.name;
       const lineNumber = finding.finding_details.file_line_number;
-      const method = finding.finding_details.procedure;
+      // const method = finding.finding_details.procedure;
       const fileName = finding.finding_details.file_name;
       let filePath = finding.finding_details.file_path;
       if (inputs.src_root && inputs.jsp_root) {
@@ -57,8 +57,6 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
         cve: id,
         severity,
         description,
-        method,
-        fileName,
         scanner: {
           id: 'security_code_scan',
           name: 'Veracode Static Code Analysis',
@@ -148,7 +146,7 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   const existingGLIssues: GLIssue[] = await getGitLabIssues(inputs.gitlab_token);
 
   const gitlabIssuesToAdd: GLIssue[] = [];
-  for(const glIssue of gitlabIssuesArr) {
+  for (const glIssue of gitlabIssuesArr) {
     // Check if the issue already exists
     const existingIssue = existingGLIssues.find((issue) => issue.title === glIssue.title && issue.state === 'opened');
     if (!existingIssue) {
