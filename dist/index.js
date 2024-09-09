@@ -685,15 +685,15 @@ async function preparePolicyResults(inputs) {
             gitlabIssuesToAdd.push(glIssue);
         }
     }
-    await Promise.all(gitlabIssuesToAdd.map(async (issue) => {
+    for (const issue of gitlabIssuesToAdd) {
         try {
             const response = await (0, gitlab_service_1.createGitLabIssue)(inputs.gitlab_token, issue);
-            console.log(`Issues is: ${issue}, GitLab issue created: ${response}`);
+            console.log(`GitLab issue created: ${response}`);
         }
         catch (error) {
             console.error(`Error creating GitLab issue: ${error}`);
         }
-    }));
+    }
 }
 function getSeverity(weight) {
     switch (weight) {

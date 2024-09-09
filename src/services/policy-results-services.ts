@@ -155,17 +155,25 @@ export async function preparePolicyResults(inputs: VeracodeActionsInputs): Promi
   }
 
   // Create a GitLab issue
-  // Use the GitLab API to create issues concurrently
-  await Promise.all(
-    gitlabIssuesToAdd.map(async (issue) => {
-      try {
-        const response = await createGitLabIssue(inputs.gitlab_token, issue);
-        console.log(`Issues is: ${issue}, GitLab issue created: ${response}`);
-      } catch (error) {
-        console.error(`Error creating GitLab issue: ${error}`);
-      }
-    }),
-  );
+  // Use the GitLab API to create issues
+  for (const issue of gitlabIssuesToAdd) {
+    try {
+      const response = await createGitLabIssue(inputs.gitlab_token, issue);
+      console.log(`GitLab issue created: ${response}`);
+    } catch (error) {
+      console.error(`Error creating GitLab issue: ${error}`);
+    }
+  }
+  // await Promise.all(
+  //   gitlabIssuesToAdd.map(async (issue) => {
+  //     try {
+  //       const response = await createGitLabIssue(inputs.gitlab_token, issue);
+  //       console.log(`Issues is: ${issue}, GitLab issue created: ${response}`);
+  //     } catch (error) {
+  //       console.error(`Error creating GitLab issue: ${error}`);
+  //     }
+  //   }),
+  // );
 }
 
 // Function to map severity values (optional)
